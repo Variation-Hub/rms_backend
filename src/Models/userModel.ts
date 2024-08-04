@@ -103,7 +103,7 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
-    currentJob: {
+    lookingFor: {
         type: String,
         trim: true,
         default: "",
