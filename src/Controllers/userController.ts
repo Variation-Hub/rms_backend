@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import userModel from "../Models/userModel"
 import { generateToken } from "../Util/JwtAuth"
 import { comparepassword } from "../Util/bcrypt"
+import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -89,6 +90,52 @@ export const updateUser = async (req: Request, res: Response) => {
             message: "User updated successfully",
             status: true,
             data: updatedUser
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const uploadFile = async (req: any, res: Response) => {
+    try {
+        let file
+        if (req.files?.length === 1) {
+            file = await uploadToBackblazeB2(req.files[0], "files")
+        } else if (req.files?.length > 1) {
+            file = await uploadMultipleFilesBackblazeB2(req.files, "files")
+        }
+
+        return res.status(200).json({
+            message: "file uploaded successfully",
+            status: true,
+            data: file
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const deleteFiles = async (req: Request, res: Response) => {
+    try {
+
+        let { files } = req.body
+
+        files.forEach(async (file: { key: string }) => {
+            await deleteFromBackblazeB2(file)
+        });
+        // files = await deleteMultipleFromS3(files.map((file: { key: string }) => file.key))
+        return res.status(200).json({
+            message: "file deleted successfully",
+            status: true,
+            // data: files
         });
     } catch (err: any) {
         return res.status(500).json({
