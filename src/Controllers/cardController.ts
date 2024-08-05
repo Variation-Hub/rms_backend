@@ -5,17 +5,19 @@ import { emailHelper } from "../Util/nodemailer";
 
 export const createCard = async (req: any, res: Response) => {
     try {
-        let file = {};
-        if (req.file) {
-            file = await uploadToBackblazeB2(req.file, "card")
-        }
-        const card = await CardModel.create({ ...req.body, file })
-        emailHelper("abhishek@weetgateithub.com", card, req.user)
+        // let file = {};
+        // if (req.file) {
+        //     file = await uploadToBackblazeB2(req.file, "card")
+        // }
+        req.body.forEach(async (value: any) => {
+            const card = await CardModel.create(value)
+            emailHelper("abhishek@weetgateithub.com", card, req.user)
+        })
 
         return res.status(200).json({
             message: "card create success",
             status: true,
-            data: card
+            data: "Multiple card created successfully"
         });
     } catch (err: any) {
         return res.status(500).json({
