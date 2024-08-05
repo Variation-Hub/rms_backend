@@ -78,6 +78,11 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    callTime: {
+        type: String,
+        trim: true,
+        default: "",
+    },
     expectedDayRate: {
         type: String,
         trim: true,
