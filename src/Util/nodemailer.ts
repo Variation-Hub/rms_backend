@@ -12,7 +12,7 @@ const generateEmailTemplateCard = (data: any) => {
     return `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <div style="background-color: #007BFF; padding: 20px; text-align: center;">
-                <h2 style="color: #fff; margin: 0;">WhyQ Tech</h2>
+                <h2 style="color: #fff; margin: 0;">Saiven Technology Solution</h2>
             </div>
             <div style="padding: 20px;">
                 <ul style="list-style: none; padding: 0;">

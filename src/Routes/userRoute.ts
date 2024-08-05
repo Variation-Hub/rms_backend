@@ -6,10 +6,11 @@ import {
     loginUser,
     updateUser,
 } from '../Controllers/userController';
+import { singleFileUpload } from '../Util/multer';
 
 const userRoutes = express.Router();
 
-userRoutes.post("/register", createUser);
+userRoutes.post("/register", singleFileUpload("profilePicture"), createUser);
 userRoutes.post("/login", loginUser);
 userRoutes.patch("/update/:id", updateUser);
 

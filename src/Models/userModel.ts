@@ -123,6 +123,10 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    profilePicture: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
     createdAt: {
         type: Date,
         default: Date.now

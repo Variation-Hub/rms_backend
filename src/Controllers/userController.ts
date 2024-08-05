@@ -17,8 +17,11 @@ export const createUser = async (req: Request, res: Response) => {
                 data: null
             })
         }
-
-        const newUser = await userModel.create(req.body)
+        let profilePicture = {}
+        if (req.file) {
+            profilePicture = await uploadToBackblazeB2(req.file, "profilePicture")
+        }
+        const newUser = await userModel.create({ ...req.body, profilePicture })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, userName: newUser.userName })
         return res.status(200).json({
             message: "User registartion success",
