@@ -76,7 +76,7 @@ export const loginUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { password, email, ...updateData } = req.body;
+        const { email, ...updateData } = req.body;
 
         const user = await userModel.findById(id);
         if (!user) {
