@@ -3,7 +3,7 @@ import { Response, NextFunction } from "express";
 
 const secret = process.env.SECRET_KEY as string;
 
-export const authorizeRoles = (...roles: string[]) => {
+export const authorizeRoles = () => {
     return (req: any, res: Response, next: NextFunction) => {
         const BearerToken: string | undefined = req.header('authorization');
 
@@ -33,15 +33,6 @@ export const authorizeRoles = (...roles: string[]) => {
                 });
             }
 
-            const userRole: string | null = tokenResult.role;
-
-            if (!userRole || (!roles.includes(userRole) && roles.length > 0)) {
-                return res.status(403).json({
-                    status: false,
-                    message: `Role: ${userRole} is not allowed to access this resource`
-                });
-            }
-            req.tokenrole = tokenResult.role;
             req.user = tokenResult;
         } else {
             return res.status(401).json({

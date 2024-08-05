@@ -10,7 +10,7 @@ export const createCard = async (req: any, res: Response) => {
             file = await uploadToBackblazeB2(req.file, "card")
         }
         const card = await CardModel.create({ ...req.body, file })
-        emailHelper("abhishek@weetgateithub.com", card)
+        emailHelper("abhishek@weetgateithub.com", card, req.user)
 
         return res.status(200).json({
             message: "card create success",
