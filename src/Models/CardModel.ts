@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { cardType } from "../Util/contant";
 
 const CardModel = new mongoose.Schema({
     rolesInDemand: {
@@ -34,6 +35,12 @@ const CardModel = new mongoose.Schema({
     file: {
         type: mongoose.Schema.Types.Mixed,
         default: {}
+    },
+    type: {
+        type: String,
+        enum: cardType,
+        required: true,
+        default: cardType.CIR
     },
     createdAt: {
         type: Date,
