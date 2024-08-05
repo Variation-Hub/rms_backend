@@ -127,6 +127,31 @@ const userModel = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {}
     },
+    emergencyName: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    emergencyEmail: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    courseName: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    qualificationAndCertification: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    currency: {
+        type: String,
+        trim: true,
+        default: "",
+    },
     createdAt: {
         type: Date,
         default: Date.now
