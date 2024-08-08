@@ -4,6 +4,7 @@ import { generateToken } from "../Util/JwtAuth"
 import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
+import mongoose from "mongoose"
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -213,3 +214,53 @@ export const loginACRUser = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const getModelData = async (req: Request, res: Response) => {
+    try {
+        const { modelName } = req.query;
+
+        if (!modelName || typeof modelName !== 'string') {
+            return res.status(400).json({
+                message: "Invalid or missing modelName in query",
+                status: false,
+                data: null
+            });
+        }
+
+        const Model = mongoose.model(modelName);
+
+        if (!Model) {
+            return res.status(404).json({
+                message: "Model not found",
+                status: false,
+                data: null
+            });
+        }
+
+        const { page, limit, skip } = req.pagination!;
+
+        const data = await Model.find()
+            .skip(skip)
+            .limit(limit);
+
+        const totalCount = await Model.countDocuments();
+
+        return res.status(200).json({
+            message: "Data fetched successfully",
+            status: true,
+            data,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / (limit as number))
+            }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+};
