@@ -116,5 +116,74 @@ export async function emailHelper(reciverEmail: string, data: any, user: any) {
     } catch (err) {
         console.log(err)
     }
+}
 
+
+const generateEmailTemplateForgotPassword = (data: any) => {
+    return `<h1>Reset Password Link</h1>
+        <a href="${data.link}" target="_blank">Reset Password Link</a>
+    `
+}
+export async function forgotEmailSend(data: any) {
+    try {
+        await transporter.sendMail({
+            from: 'service@uncleblock.in', // sender address
+            to: data.email, // list of receivers
+            subject: "Forgot Password Link", // Subject line
+            text: `reset link ${data.link}`, // plain text body
+            html: generateEmailTemplateForgotPassword(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+const referViaCode = (data: any) => {
+    return `<h1>Refer</h1>
+        <a href="${data.link}" target="_blank">Refer link</a>
+    `
+}
+export async function referViaCodeEmailSend(data: any) {
+    try {
+        await transporter.sendMail({
+            from: 'service@uncleblock.in', // sender address
+            to: data.email, // list of receivers
+            subject: `Refer by ${data.name}`, // Subject line
+            text: `refer link ${data.link}`, // plain text body
+            html: referViaCode(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+const inviteLoginEmail = (data: any) => {
+    return `<h1>Welcome</h1>
+        <a href="${data.link}" target="_blank">Login link</a>
+    `
+}
+export async function inviteLoginEmailSend(data: any) {
+    try {
+        await transporter.sendMail({
+            from: 'service@uncleblock.in', // sender address
+            to: data.email, // list of receivers
+            subject: `Welcome Email`, // Subject line
+            text: `Login link ${data.link}`, // plain text body
+            html: inviteLoginEmail(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
 }

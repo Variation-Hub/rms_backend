@@ -11,42 +11,18 @@ const userModel = new mongoose.Schema({
         type: String,
         required: true,
     },
-    userName: {
-        type: String,
-        trim: true,
-        default: "",
-    },
     email: {
         type: String,
         unique: true,
         trim: true,
         required: true,
     },
-    secondaryEmail: {
+    countrycode: {
         type: String,
         trim: true,
         default: "",
     },
     phoneNumber: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    secondaryPhoneNumber: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    dataOfBirth: {
-        type: Date,
-        default: null
-    },
-    education: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    currentLocation: {
         type: String,
         trim: true,
         default: "",
@@ -57,21 +33,12 @@ const userModel = new mongoose.Schema({
         default: "",
     },
     UKDrivinglicense: {
-        type: Boolean,
-        default: false
-    },
-    emergencyContact: {
         type: String,
-        trim: true,
-        default: "",
+        default: ""
     },
-    anySC_DV: {
-        type: Boolean,
-        default: false
-    },
-    sponsorForClearanceCertificate: {
-        type: Boolean,
-        default: false
+    UKVisaType: {
+        type: String,
+        default: ""
     },
     callDay: {
         type: String,
@@ -92,62 +59,46 @@ const userModel = new mongoose.Schema({
         type: String,
         trim: true,
         default: "",
-
     },
-    noticePeriod: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    futureAvailability: {
-        type: Date,
-        default: null,
-    },
-    currentJobIs: {
+    currentWork: {
         type: String,
         trim: true,
         default: "",
     },
     lookingFor: {
+        type: [String],
+        default: [],
+    },
+    workLocation: {
         type: String,
         trim: true,
         default: "",
     },
-    workingPreference: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    Availability: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    profilePicture: {
+    cv: {
         type: mongoose.Schema.Types.Mixed,
         default: {}
     },
-    emergencyName: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    emergencyEmail: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    courseName: {
-        type: String,
-        trim: true,
-        default: "",
-    },
-    qualificationAndCertification: {
-        type: String,
-        trim: true,
-        default: "",
-    },
     currency: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    country: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    city: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    postalCode: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    anyQuestion:{
         type: String,
         trim: true,
         default: "",

@@ -1,10 +1,14 @@
-import { Request, Response } from "express"
+import { Request, response, Response } from "express"
 import userModel from "../Models/userModel"
+import referAndEarnModel from '../Models/referModel'
 import { generateToken } from "../Util/JwtAuth"
 import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
+import { forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend } from "../Util/nodemailer"
+import jwt from 'jsonwebtoken';
+
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -18,12 +22,25 @@ export const createUser = async (req: Request, res: Response) => {
                 data: null
             })
         }
-        let profilePicture = {}
+        let cv = {}
         if (req.file) {
-            profilePicture = await uploadToBackblazeB2(req.file, "profilePicture")
+            cv = await uploadToBackblazeB2(req.file, "cv")
         }
-        const newUser = await userModel.create({ ...req.body, profilePicture })
-        const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, userName: newUser.userName })
+
+        let referredBy = await referAndEarnModel.findOne();
+        if (!referredBy) {
+            referredBy = await referAndEarnModel.create({ code: 0 });
+        }
+
+        const newUser = await userModel.create({ ...req.body, cv, referredBy: referredBy.code })
+        const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredBy: referredBy.code })
+
+        referredBy.code += 1;
+        await referredBy.save();
+
+        const loginLink = `${process.env.FRONTEND_URL}`
+        await inviteLoginEmailSend({email: newUser.email, link: loginLink});
+
         return res.status(200).json({
             message: "User registartion success",
             status: true,
@@ -59,7 +76,7 @@ export const loginUser = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.email, name: user.name, userName: user.userName })
+        const token = generateToken({ _id: user._id, email: user.email, name: user.name, referredBy: user.referredBy })
         return res.status(200).json({
             message: "User login success",
             status: true,
@@ -215,9 +232,136 @@ export const loginACRUser = async (req: Request, res: Response) => {
     }
 }
 
+export const forgotUserPassword = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const user: any = await userModel.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        const token = jwt.sign(
+            { email: user.email, name: user.name },
+            process.env.SECRET_KEY as string,
+            { expiresIn: '10m' } // Token expires in 10 minutes
+        );
+
+        const resetLink = `${process.env.FRONTEND_URL}?token=${token}`;
+
+        const response = await forgotEmailSend({ email: user.email, link: resetLink });
+
+        if (response) {
+            return res.status(200).json({
+                message: "Password reset link sent to your email",
+                status: true,
+                data: null
+            });
+        } else {
+            return res.status(500).json({
+                message: "Failed to send password reset link",
+                status: false,
+                data: null
+            });
+        }
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+    try {
+        const { token, password } = req.body;
+
+        if (!token) {
+            return res.status(400).json({
+                message: "Token is required",
+                status: false,
+                data: null
+            });
+        }
+
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+        const user = await userModel.findOne({ email: decodedToken.email });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        user.password = password;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password has been reset successfully",
+            status: true,
+            data: null
+        });
+
+    } catch (err: any) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(400).json({
+                message: "Token has expired",
+                status: false,
+                data: null
+            });
+        }
+
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const referUser = async (req: any, res: Response) => {
+    try {
+        const refercode = req.user.referredBy
+        const { name, email } = req.body;
+        const referLink = `${process.env.FRONTEND_URL}?code=${refercode}`;
+        const response = await referViaCodeEmailSend({ name, email, link: referLink })
+        if (response) {
+            return res.status(200).json({
+                message: "Referal link sent to your email",
+                status: true,
+                data: null
+            });
+        } else {
+            return res.status(500).json({
+                message: "Failed to send referal link",
+                status: false,
+                data: null
+            });
+        }
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
 export const getModelData = async (req: Request, res: Response) => {
     try {
         const { modelName } = req.query;
+        const filter = req.query
+        delete filter.modelName;
+        delete filter.page;
+        delete filter.limit;
 
         if (!modelName || typeof modelName !== 'string') {
             return res.status(400).json({
@@ -239,7 +383,7 @@ export const getModelData = async (req: Request, res: Response) => {
 
         const { page, limit, skip } = req.pagination!;
 
-        const data = await Model.find()
+        const data = await Model.find(filter)
             .skip(skip)
             .limit(limit);
 
