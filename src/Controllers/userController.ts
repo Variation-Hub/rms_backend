@@ -22,24 +22,24 @@ export const createUser = async (req: Request, res: Response) => {
                 data: null
             })
         }
-        let cv = {}
-        if (req.file) {
-            cv = await uploadToBackblazeB2(req.file, "cv")
-        }
 
         let referredBy = await referAndEarnModel.findOne();
         if (!referredBy) {
             referredBy = await referAndEarnModel.create({ code: 0 });
         }
 
-        const newUser = await userModel.create({ ...req.body, cv, referredBy: referredBy.code })
+        let lookingFor = [];
+        if (req.body.lookingFor) {
+            lookingFor = req.body.lookingFor.split(',')
+        }
+        const newUser = await userModel.create({ ...req.body, lookingFor, referredBy: referredBy.code })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredBy: referredBy.code })
 
         referredBy.code += 1;
         await referredBy.save();
 
         const loginLink = `${process.env.FRONTEND_URL}`
-        await inviteLoginEmailSend({email: newUser.email, link: loginLink});
+        await inviteLoginEmailSend({ email: newUser.email, link: loginLink });
 
         return res.status(200).json({
             message: "User registartion success",
@@ -94,8 +94,9 @@ export const loginUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { email, ...updateData } = req.body;
+        const updateData = req.body;
 
+        console.log(id, req.body);
         const user = await userModel.findById(id);
         if (!user) {
             return res.status(404).json({
