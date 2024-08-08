@@ -33,8 +33,8 @@ const userModel = new mongoose.Schema({
         default: "",
     },
     UKDrivinglicense: {
-        type: String,
-        default: ""
+        type: Boolean,
+        default: false
     },
     UKVisaType: {
         type: String,
