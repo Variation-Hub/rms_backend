@@ -39,7 +39,7 @@ export const createUser = async (req: Request, res: Response) => {
         await referredBy.save();
 
         const loginLink = `${process.env.FRONTEND_URL}`
-        await inviteLoginEmailSend({ email: newUser.email, link: loginLink });
+        await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
 
         return res.status(200).json({
             message: "User registartion success",
@@ -332,7 +332,17 @@ export const referUser = async (req: any, res: Response) => {
         const refercode = req.user.referredBy
         const { name, email } = req.body;
         const referLink = `${process.env.FRONTEND_URL}?code=${refercode}`;
-        const response = await referViaCodeEmailSend({ name, email, link: referLink })
+
+        const user = await userModel.findOne({ referredBy: refercode });
+        if (!user) {
+            return res.status(404).json({
+                message: "Referral code not found",
+                status: false,
+                data: null
+            });
+        }
+
+        const response = await referViaCodeEmailSend({ newCandidateName: name, name: user.name, email, link: referLink, referralCode: refercode })
         if (response) {
             return res.status(200).json({
                 message: "Referal link sent to your email",

@@ -143,17 +143,34 @@ export async function forgotEmailSend(data: any) {
 }
 
 const referViaCode = (data: any) => {
-    return `<h1>Refer</h1>
-        <a href="${data.link}" target="_blank">Refer link</a>
-    `
+    return `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #004085;">Invitation to Join Saiven Technology Solutions</h2>
+            <p>Dear ${data.newCandidateName},</p>
+            <p>You have been referred by ${data.name} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.</p>
+            <p>To get started, please complete your registration by clicking the link below:</p>
+            <p style="text-align: center;">
+                <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Complete Your Registration</a>
+            </p>
+            <p>Once registered, you will gain access to opportunities in UK Public Sector Contracts and be a part of a community of professionals just like you.</p>
+            <p><strong>Important:</strong> Please use the Referral Code – <strong>${data.referralCode}</strong> while completing your registration.</p>
+            <p>We look forward to welcoming you!</p>
+            <br/>
+            <p>Best regards,</p>
+            <p><strong>HR Team</strong><br/>
+               Saiven Technology Solutions
+            </p>
+        </div>
+    `;
 }
+
 export async function referViaCodeEmailSend(data: any) {
     try {
         await transporter.sendMail({
             from: 'service@uncleblock.in', // sender address
             to: data.email, // list of receivers
-            subject: `Refer by ${data.name}`, // Subject line
-            text: `refer link ${data.link}`, // plain text body
+            subject: `Invitation to Join Saiven Technology Solutions - Referred by ${data.name}`, // Subject line
+            text: `Dear ${data.newCandidateName},\n\nYou have been referred by ${data.name} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.\n\nTo get started, please complete your registration by clicking the link below: ${data.link}\n\nOnce registered, you will gain access to opportunities in UK Public Sector Contracts and be a part of a community of professionals just like you.\n\nImportant: Please use the Referral Code – ${data.referralCode} while completing your registration.\n\nWe look forward to welcoming you!\n\nBest regards,\nHR Team\nSaiven Technology Solutions`, // plain text body
             html: referViaCode(data), // html body
         });
 
@@ -165,18 +182,36 @@ export async function referViaCodeEmailSend(data: any) {
     }
 }
 
+
 const inviteLoginEmail = (data: any) => {
-    return `<h1>Welcome</h1>
-        <a href="${data.link}" target="_blank">Login link</a>
-    `
+    return `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #004085;">Welcome to Saiven Technology Solutions</h2>
+            <p>Dear ${data.candidateName},</p>
+            <p>Thank you for registering with us! We are excited to have you join our network of professionals.</p>
+            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us.</p>
+            <p style="text-align: center;">
+                <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px;">Log in to Your Portal</a>
+            </p>
+            <p>If you have any questions or need assistance, please feel free to reach out to me at <a href="mailto:jamie.thompson@saivensolutions.co.uk">jamie.thompson@saivensolutions.co.uk</a>.</p>
+            <p>We look forward to working with you!</p>
+            <br/>
+            <p>Best regards,</p>
+            <p><strong>Jamie Thompson</strong><br/>
+               Recruitment Lead<br/>
+               Saiven Technology Solutions
+            </p>
+        </div>
+    `;
 }
+
 export async function inviteLoginEmailSend(data: any) {
     try {
         await transporter.sendMail({
             from: 'service@uncleblock.in', // sender address
             to: data.email, // list of receivers
-            subject: `Welcome Email`, // Subject line
-            text: `Login link ${data.link}`, // plain text body
+            subject: `Welcome to Saiven Technology Solutions - Access Your Candidate Portal`, // Subject line
+            text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk.\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body
             html: inviteLoginEmail(data), // html body
         });
 
