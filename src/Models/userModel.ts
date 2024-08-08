@@ -70,9 +70,8 @@ const userModel = new mongoose.Schema({
         default: [],
     },
     workLocation: {
-        type: String,
-        trim: true,
-        default: "",
+        type: [String],
+        default: [],
     },
     cv: {
         type: mongoose.Schema.Types.Mixed,
