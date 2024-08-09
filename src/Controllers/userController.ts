@@ -38,7 +38,7 @@ export const createUser = async (req: Request, res: Response) => {
         referredBy.code += 1;
         await referredBy.save();
 
-        const loginLink = `${process.env.FRONTEND_URL}`
+        const loginLink = `http://rms.saivensolutions.co.uk:4200/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
 
         return res.status(200).json({
@@ -251,7 +251,7 @@ export const forgotUserPassword = async (req: Request, res: Response) => {
             { expiresIn: '10m' } // Token expires in 10 minutes
         );
 
-        const resetLink = `${process.env.FRONTEND_URL}?token=${token}`;
+        const resetLink = `http://rms.saivensolutions.co.uk:4200/#/cir/cir-reset-password?token=${token}`;
 
         const response = await forgotEmailSend({ email: user.email, link: resetLink });
 
@@ -331,7 +331,7 @@ export const referUser = async (req: any, res: Response) => {
     try {
         const refercode = req.user.referredBy
         const { name, email } = req.body;
-        const referLink = `${process.env.FRONTEND_URL}?code=${refercode}`;
+        const referLink = `http://rms.saivensolutions.co.uk:4200/#/cir/cir-register?code=${refercode}`;
 
         const user = await userModel.findOne({ referredBy: refercode });
         if (!user) {

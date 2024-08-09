@@ -43,6 +43,7 @@ export const uploadToBackblazeB2 = async (fileData: FileData, folderName: string
     return {
       key: fileName,
       url: fileUrl,
+      name: fileData.originalname
     };
   } catch (error) {
     console.error("Error uploading file to Backblaze B2:", error);
