@@ -9,11 +9,12 @@ import {
     resetPassword,
     referUser
 } from '../Controllers/userController';
+import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
 
 const userRoutes = express.Router();
 
-userRoutes.post("/register", createUser);
+userRoutes.post("/register", singleFileUpload("cv"), createUser);
 userRoutes.post("/login", loginUser);
 userRoutes.patch("/update/:id", updateUser);
 userRoutes.post("/forgot", forgotUserPassword)
