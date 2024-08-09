@@ -10,12 +10,8 @@ const ClientModel = new mongoose.Schema({
         default: ""
     },
     roles: {
-        type: [String],
+        type: [mongoose.Schema.Types.Mixed],
         default: []
-    },
-    description: {
-        type: String,
-        default: "",
     }
 }, { versionKey: false });
 
