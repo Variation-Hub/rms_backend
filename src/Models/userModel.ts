@@ -97,10 +97,34 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
-    anyQuestion:{
+    anyQuestion: {
         type: String,
         trim: true,
         default: "",
+    },
+    client1: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client2: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client3: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
     },
     createdAt: {
         type: Date,

@@ -122,6 +122,33 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 }
 
+export const getUser = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        return res.status(200).json({
+            message: "User fetch successfully",
+            status: true,
+            data: user
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
 export const uploadFile = async (req: any, res: Response) => {
     try {
         let file
