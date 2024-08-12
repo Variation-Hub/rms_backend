@@ -8,7 +8,9 @@ import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
 import { forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
+const { Parser } = require('json2csv');
 
+const url = 'https://rms.saivensolutions.co.uk';
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -38,7 +40,7 @@ export const createUser = async (req: Request, res: Response) => {
         referredBy.code += 1;
         await referredBy.save();
 
-        const loginLink = `https://rms.whyqtech.com/#/cir/cir-login`
+        const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
 
         return res.status(200).json({
@@ -278,7 +280,7 @@ export const forgotUserPassword = async (req: Request, res: Response) => {
             { expiresIn: '10m' } // Token expires in 10 minutes
         );
 
-        const resetLink = `https://rms.whyqtech.com/#/cir/cir-reset-password?token=${token}`;
+        const resetLink = `${url}/#/cir/cir-reset-password?token=${token}`;
 
         const response = await forgotEmailSend({ email: user.email, link: resetLink });
 
@@ -358,7 +360,7 @@ export const referUser = async (req: any, res: Response) => {
     try {
         const refercode = req.user.referredBy
         const { name, email } = req.body;
-        const referLink = `https://rms.whyqtech.com/#/cir/cir-register?code=${refercode}`;
+        const referLink = `${url}/#/cir/cir-register?code=${refercode}`;
 
         const user = await userModel.findOne({ referredBy: refercode });
         if (!user) {
@@ -444,5 +446,51 @@ export const getModelData = async (req: Request, res: Response) => {
             status: false,
             data: null
         });
+    }
+};
+
+export const downloadCsv = async (req: Request, res: Response) => {
+    try {
+        const { modelName } = req.query;
+
+        if (!modelName || typeof modelName !== 'string') {
+            return res.status(400).json({
+                message: "Invalid or missing modelName in query",
+                status: false,
+                data: null
+            });
+        }
+
+        const Model = mongoose.model(modelName);
+
+        if (!Model) {
+            return res.status(404).json({
+                message: "Model not found",
+                status: false,
+                data: null
+            });
+        }
+
+
+        const data = await Model.find().lean()
+
+        if (data.length === 0) {
+            return res.status(404).json({
+                message: "No data found",
+                status: false,
+                data: null
+            });
+        }
+
+        const json2csvParser = new Parser();
+        const csv = json2csvParser.parse(data);
+
+        // Set response headers for file download
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${modelName}data.csv`);
+        return res.send(csv);
+    } catch (error) {
+        console.error('Error generating CSV:', error);
+        return res.status(500).send('Server Error');
     }
 };

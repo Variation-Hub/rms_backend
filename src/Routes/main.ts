@@ -1,6 +1,6 @@
 import * as express from 'express';
 import userRoutes from './userRoute';
-import { deleteFiles, getModelData, uploadFile } from '../Controllers/userController';
+import { deleteFiles, getModelData, uploadFile, downloadCsv } from '../Controllers/userController';
 import { multipleFileUpload } from '../Util/multer';
 import cardRoutes from './cardRoute';
 import clientRoutes from './clientRoute'
@@ -18,5 +18,6 @@ Routes.use("/client", clientRoutes);
 Routes.post("/upload", multipleFileUpload('files', 5), uploadFile);
 Routes.delete("/upload/delete", deleteFiles);
 Routes.get("/model/list", authorizeRolesWithoutErrorDB, paginationMiddleware, getModelData);
+Routes.get("/model/download", downloadCsv);
 
 export default Routes; 

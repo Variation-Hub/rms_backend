@@ -27,6 +27,10 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    profile: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
     nationality: {
         type: String,
         trim: true,
