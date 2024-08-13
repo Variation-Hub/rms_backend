@@ -45,14 +45,12 @@ const userModel = new mongoose.Schema({
         default: ""
     },
     callDay: {
-        type: String,
-        trim: true,
-        default: "",
+        type: [String],
+        default: [],
     },
     callTime: {
-        type: String,
-        trim: true,
-        default: "",
+        type: [String],
+        default: [],
     },
     expectedDayRate: {
         type: String,
