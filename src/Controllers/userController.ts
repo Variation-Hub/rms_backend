@@ -27,7 +27,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         let referredBy = await referAndEarnModel.findOne();
         if (!referredBy) {
-            referredBy = await referAndEarnModel.create({ code: 0 });
+            referredBy = await referAndEarnModel.create({ code: 5 });
         }
 
         let lookingFor = [];
@@ -98,7 +98,6 @@ export const updateUser = async (req: Request, res: Response) => {
         const { id } = req.params;
         const updateData = req.body;
 
-        console.log(id, req.body);
         const user = await userModel.findById(id);
         if (!user) {
             return res.status(404).json({
@@ -359,7 +358,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const referUser = async (req: any, res: Response) => {
     try {
         const refercode = req.user.referredBy
-        const { name, email } = req.body;
+        const data = req.body;
         const referLink = `${url}/#/cir/cir-register?code=${refercode}`;
 
         const user = await userModel.findOne({ referredBy: refercode });
@@ -370,21 +369,33 @@ export const referUser = async (req: any, res: Response) => {
                 data: null
             });
         }
+        const sendEmails = data.map(async (item: any) => {
+            return await referViaCodeEmailSend({
+                newCandidateName: item.name,
+                name: user.name,
+                currentWork: item.jobTitle,
+                email: item.email,
+                link: referLink,
+                referralCode: refercode
+            });
+        });
 
-        const response = await referViaCodeEmailSend({ newCandidateName: name, name: user.name, email, link: referLink, referralCode: refercode })
-        if (response) {
-            return res.status(200).json({
-                message: "Referal link sent to your email",
-                status: true,
-                data: null
+        Promise.all(sendEmails)
+            .then(() => {
+                return res.status(200).json({
+                    message: "Referral link sent to your email",
+                    status: true,
+                    data: null
+                });
+            })
+            .catch(() => {
+                return res.status(500).json({
+                    message: "Failed to send referral link",
+                    status: false,
+                    data: null
+                });
             });
-        } else {
-            return res.status(500).json({
-                message: "Failed to send referal link",
-                status: false,
-                data: null
-            });
-        }
+
 
     } catch (err: any) {
         return res.status(500).json({

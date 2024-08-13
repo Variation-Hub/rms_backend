@@ -4,10 +4,11 @@ export const transporter = nodemailer.createTransport({
     host: "live.smtp.mailtrap.io",
     port: 587,
     auth: {
-        user: "api",
-        pass: "b8c3571b2e58a51a9ddfc53c768cf1ae"
+      user: "api",
+      pass: "6032e77ba3996b3696c7b9c5b8fc8d4e"
     }
-});
+  });
+
 const generateEmailTemplateCard = (data: any, user: any) => {
     return `
     <div align="center" class="esd-block-image es-p10t es-p10b" style="padding: 10px 0; margin: 0; font-size: 0px;">
@@ -106,7 +107,7 @@ export async function emailHelper(reciverEmail: string, data: any, user: any) {
 
     try {
         await transporter.sendMail({
-            from: 'service@uncleblock.in', // sender address
+            from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
             subject: "New Card Add", // Subject line
             text: `Your password is `, // plain text body
@@ -120,16 +121,29 @@ export async function emailHelper(reciverEmail: string, data: any, user: any) {
 
 
 const generateEmailTemplateForgotPassword = (data: any) => {
-    return `<h1>Reset Password Link</h1>
-        <a href="${data.link}" target="_blank">Reset Password Link</a>
-    `
+    return `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <p>Dear ${data.newCandidateName},</p>
+            <p>We received a request to reset the password for your account. If you have made this request, please click the link below to reset your password:</p>
+            <p style="text-align: center;">
+                <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Reset Password Link</a>
+            </p>
+            <p>For your security, this link will expire in 24 hours. If you did not request a password reset, please ignore this email, and your password will remain unchanged.</p>
+            <p>If you have any questions or need assistance, please feel free to reach out to us at <a href="mailto:info@saivensolutions.co.uk">info@saivensolutions.co.uk</a></p>
+            <br/>
+            <p>Best regards,</p>
+            <p><strong>Tech Team</strong><br/>
+               Saiven Technology Solutions
+            </p>
+        </div>
+    `;
 }
 export async function forgotEmailSend(data: any) {
     try {
         await transporter.sendMail({
-            from: 'service@uncleblock.in', // sender address
+            from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
-            subject: "Forgot Password Link", // Subject line
+            subject: "Reset Your Password for Saiven Technology Solutions Account", // Subject line
             text: `reset link ${data.link}`, // plain text body
             html: generateEmailTemplateForgotPassword(data), // html body
         });
@@ -145,9 +159,8 @@ export async function forgotEmailSend(data: any) {
 const referViaCode = (data: any) => {
     return `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <h2 style="color: #004085;">Invitation to Join Saiven Technology Solutions</h2>
             <p>Dear ${data.newCandidateName},</p>
-            <p>You have been referred by ${data.name} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.</p>
+            <p>You have been referred by ${data.name}  for your professional expertise as a ${data.currentWork} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.</p>
             <p>To get started, please complete your registration by clicking the link below:</p>
             <p style="text-align: center;">
                 <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Complete Your Registration</a>
@@ -167,9 +180,9 @@ const referViaCode = (data: any) => {
 export async function referViaCodeEmailSend(data: any) {
     try {
         await transporter.sendMail({
-            from: 'service@uncleblock.in', // sender address
+            from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
-            subject: `Invitation to Join Saiven Technology Solutions - Referred by ${data.name}`, // Subject line
+            subject: `Invitation to Join Saiven Technology Solutions - Complete Your Registration`, // Subject line
             text: `Dear ${data.newCandidateName},\n\nYou have been referred by ${data.name} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.\n\nTo get started, please complete your registration by clicking the link below: ${data.link}\n\nOnce registered, you will gain access to opportunities in UK Public Sector Contracts and be a part of a community of professionals just like you.\n\nImportant: Please use the Referral Code – ${data.referralCode} while completing your registration.\n\nWe look forward to welcoming you!\n\nBest regards,\nHR Team\nSaiven Technology Solutions`, // plain text body
             html: referViaCode(data), // html body
         });
@@ -186,12 +199,12 @@ export async function referViaCodeEmailSend(data: any) {
 const inviteLoginEmail = (data: any) => {
     return `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <h2 style="color: #004085;">Welcome to Saiven Technology Solutions</h2>
             <p>Dear ${data.candidateName},</p>
-            <p>Thank you for registering with us! We are excited to have you join our network of professionals.</p>
-            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us.</p>
+            <p>Thank you for registering with Us! We are excited to have you <span style="color:red;">joining</span> our network of professionals.</p>
+            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us <span style="color:red;">and earn through refer a friend.</span></p>
+            <p style="font-weight:bold;">Click the link below to log in</p>
             <p style="text-align: center;">
-                <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px;">Log in to Your Portal</a>
+                <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px;">Login Link</a>
             </p>
             <p>If you have any questions or need assistance, please feel free to reach out to me at <a href="mailto:jamie.thompson@saivensolutions.co.uk">jamie.thompson@saivensolutions.co.uk</a>.</p>
             <p>We look forward to working with you!</p>
@@ -208,7 +221,7 @@ const inviteLoginEmail = (data: any) => {
 export async function inviteLoginEmailSend(data: any) {
     try {
         await transporter.sendMail({
-            from: 'service@uncleblock.in', // sender address
+            from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
             subject: `Welcome to Saiven Technology Solutions - Access Your Candidate Portal`, // Subject line
             text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk.\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body

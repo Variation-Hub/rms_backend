@@ -44,6 +44,10 @@ const userModel = new mongoose.Schema({
         type: String,
         default: ""
     },
+    noticePeriodDay :{
+        type: String,
+        default: ""
+    },
     callDay: {
         type: [String],
         default: [],
@@ -103,6 +107,14 @@ const userModel = new mongoose.Schema({
         type: String,
         trim: true,
         default: "",
+    },
+    sc_dv_clearance_hold:{
+        type: Boolean,
+        default: false
+    },
+    willing_to_undertake:{
+        type: Boolean,
+        default: false
     },
     client1: {
         type: mongoose.Schema.Types.Mixed,
