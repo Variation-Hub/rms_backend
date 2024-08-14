@@ -200,8 +200,8 @@ const inviteLoginEmail = (data: any) => {
     return `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <p>Dear ${data.candidateName},</p>
-            <p>Thank you for registering with Us! We are excited to have you <span style="color:red;">joining</span> our network of professionals.</p>
-            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us <span style="color:red;">and earn through refer a friend.</span></p>
+            <p>Thank you for registering with Us! We are excited to have you joining our network of professionals.</p>
+            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us and earn through refer a friend.</p>
             <p style="font-weight:bold;">Click the link below to log in</p>
             <p style="text-align: center;">
                 <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px;">Login Link</a>
