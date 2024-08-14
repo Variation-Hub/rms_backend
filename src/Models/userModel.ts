@@ -113,8 +113,9 @@ const userModel = new mongoose.Schema({
         default: false
     },
     willing_to_undertake:{
-        type: Boolean,
-        default: false
+        type: String,
+        trim: true,
+        default: ""
     },
     client1: {
         type: mongoose.Schema.Types.Mixed,
