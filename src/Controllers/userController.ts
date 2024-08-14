@@ -361,7 +361,7 @@ export const referUser = async (req: any, res: Response) => {
         const data = req.body;
         const referLink = `${url}/#/cir/cir-register?code=${refercode}`;
 
-        const user = await userModel.findOne({ referredBy: refercode });
+        const user = await userModel.findOne({ referredCode: refercode });
         if (!user) {
             return res.status(404).json({
                 message: "Referral code not found",
