@@ -25,20 +25,20 @@ export const createUser = async (req: Request, res: Response) => {
             })
         }
 
-        let referredBy = await referAndEarnModel.findOne();
-        if (!referredBy) {
-            referredBy = await referAndEarnModel.create({ code: 11 });
+        let referredCode = await referAndEarnModel.findOne();
+        if (!referredCode) {
+            referredCode = await referAndEarnModel.create({ code: 11 });
         }
 
         let lookingFor = [];
         if (req.body.lookingFor) {
             lookingFor = req.body.lookingFor.split(',')
         }
-        const newUser = await userModel.create({ ...req.body, lookingFor, referredBy: referredBy.code })
-        const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredBy: referredBy.code })
+        const newUser = await userModel.create({ ...req.body, lookingFor, referredCode: referredCode.code })
+        const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredCode: referredCode.code, referredBy: newUser.referredBy })
 
-        referredBy.code += 1;
-        await referredBy.save();
+        referredCode.code += 1;
+        await referredCode.save();
 
         const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
@@ -357,7 +357,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const referUser = async (req: any, res: Response) => {
     try {
-        const refercode = req.user.referredBy
+        const refercode = req.user.referredCode
         const data = req.body;
         const referLink = `${url}/#/cir/cir-register?code=${refercode}`;
 

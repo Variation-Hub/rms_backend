@@ -61,10 +61,15 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    referredCode:{
+        type: String,
+        trim: true,
+        default: "0",
+    },
     referredBy: {
         type: String,
         trim: true,
-        default: "",
+        default: "0",
     },
     currentWork: {
         type: String,
