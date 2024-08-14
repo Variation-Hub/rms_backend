@@ -27,7 +27,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         let referredBy = await referAndEarnModel.findOne();
         if (!referredBy) {
-            referredBy = await referAndEarnModel.create({ code: 5 });
+            referredBy = await referAndEarnModel.create({ code: 11 });
         }
 
         let lookingFor = [];
@@ -281,7 +281,7 @@ export const forgotUserPassword = async (req: Request, res: Response) => {
 
         const resetLink = `${url}/#/cir/cir-reset-password?token=${token}`;
 
-        const response = await forgotEmailSend({ email: user.email, link: resetLink });
+        const response = await forgotEmailSend({ newCandidateName: user.name, email: user.email, link: resetLink });
 
         if (response) {
             return res.status(200).json({
@@ -373,7 +373,7 @@ export const referUser = async (req: any, res: Response) => {
             return await referViaCodeEmailSend({
                 newCandidateName: item.name,
                 name: user.name,
-                currentWork: item.jobTitle,
+                currentWork: item.job_title,
                 email: item.email,
                 link: referLink,
                 referralCode: refercode
