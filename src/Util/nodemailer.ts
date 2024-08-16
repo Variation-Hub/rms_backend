@@ -249,8 +249,7 @@ const generateEmailTemplateResponseEmailSend = (data: any) => {
             </ul>
             <p>Please log in to the portal to review the details and take any necessary actions.</p>
             <br/>
-            <p>Best regards,</p>
-            <p>CIR System</p>
+            <p>Best regards,<br/>CIR System</p>
         </div>
     `;
 }
