@@ -6,7 +6,7 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend } from "../Util/nodemailer"
+import { forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 const { Parser } = require('json2csv');
 
@@ -42,6 +42,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
+        await responseEmailSend({ name: req.body.name, email: newUser.email})
 
         return res.status(200).json({
             message: "User registartion success",

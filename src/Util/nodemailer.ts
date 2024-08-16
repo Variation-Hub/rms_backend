@@ -4,10 +4,10 @@ export const transporter = nodemailer.createTransport({
     host: "live.smtp.mailtrap.io",
     port: 587,
     auth: {
-      user: "api",
-      pass: "6032e77ba3996b3696c7b9c5b8fc8d4e"
+        user: "api",
+        pass: "6032e77ba3996b3696c7b9c5b8fc8d4e"
     }
-  });
+});
 
 const generateEmailTemplateCard = (data: any, user: any) => {
     return `
@@ -226,6 +226,42 @@ export async function inviteLoginEmailSend(data: any) {
             subject: `Welcome to Saiven Technology Solutions - Access Your Candidate Portal`, // Subject line
             text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk.\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body
             html: inviteLoginEmail(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+
+
+const generateEmailTemplateResponseEmailSend = (data: any) => {
+    return `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <p>Dear Admin,</p>
+            <p>A new user has successfully registered into the CIR System. Please find the registration details below:</p>
+            <ul>
+                <li><b>User Name : </b>${data.name}</li>
+                <li><b>Email : </b>${data.email}</li>
+            </ul>
+            <p>Please log in to the portal to review the details and take any necessary actions.</p>
+            <br/>
+            <p>Best regards,</p>
+            <p>CIR System</p>
+        </div>
+    `;
+}
+export async function responseEmailSend(data: any) {
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: ["jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"], // list of receivers
+            subject: "New User Registration Alert - CIR System", // Subject line
+            text: `New User Registration Name is ${data.name} and Email is ${data.email}`, // plain text body
+            html: generateEmailTemplateResponseEmailSend(data), // html body
         });
 
         return true;
