@@ -37,28 +37,42 @@ const ACRUserModel = new mongoose.Schema({
         trim: true,
         required: true,
     },
+    phoneNumberCountryCode: {
+        type: String,
+        trim: true,
+        default: "",
+    },
     phoneNumber: {
         type: String,
         trim: true,
         default: "",
     },
-    contactDetails: {
+    secondaryContectName: {
         type: String,
         trim: true,
         default: "",
     },
-    emergencySecondaryContactDetails: {
+    secondaryDesignation: {
         type: String,
         trim: true,
         default: "",
     },
-    referredBy: {
+    secondaryEmail: {
         type: String,
         trim: true,
         default: "",
-
     },
-    userName: {
+    secondaryPhoneNumberCountryCode: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    secondaryPhoneNumber: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    contectTime: {
         type: String,
         trim: true,
         default: "",

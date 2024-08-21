@@ -42,7 +42,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
-        await responseEmailSend({ name: req.body.name, email: newUser.email})
+        await responseEmailSend({ name: req.body.name, email: newUser.email })
 
         return res.status(200).json({
             message: "User registartion success",
@@ -79,7 +79,7 @@ export const loginUser = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.email, name: user.name, referredBy: user.referredBy, referredCode:user.referredCode })
+        const token = generateToken({ _id: user._id, email: user.email, name: user.name, referredBy: user.referredBy, referredCode: user.referredCode })
         return res.status(200).json({
             message: "User login success",
             status: true,
@@ -211,7 +211,7 @@ export const createACRUser = async (req: Request, res: Response) => {
         }
 
         const newUser = await ACRUserModel.create(req.body)
-        const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName, userName: newUser.userName })
+        const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
         return res.status(200).json({
             message: "ACR User registartion success",
             status: true,
@@ -247,7 +247,7 @@ export const loginACRUser = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName, userName: user.userName })
+        const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName })
         return res.status(200).json({
             message: "ACR User login success",
             status: true,
