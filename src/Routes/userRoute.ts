@@ -8,7 +8,8 @@ import {
     forgotUserPassword,
     resetPassword,
     referUser,
-    getUser
+    getUser,
+    updateACRUser
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -26,5 +27,6 @@ userRoutes.post("/refer", authorizeRoles(), referUser)
 //ACR user routes
 userRoutes.post("/acr/register", createACRUser);
 userRoutes.post("/acr/login", loginACRUser);
+userRoutes.post("/acr/update/:id", updateACRUser);
 
 export default userRoutes;

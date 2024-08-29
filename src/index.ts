@@ -5,6 +5,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import MainRoutes from './Routes/main';
+import './Util/cronJob'
 
 const app = express();
 const port = process.env.PORT || 4000;

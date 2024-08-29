@@ -1,0 +1,60 @@
+import mongoose from 'mongoose';
+import Counter from './JobCounter';
+
+
+const JobSchema = new mongoose.Schema({
+    job_id: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
+    job_title: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    no_of_roles: {
+        type: Number,
+        required: true,
+    },
+    start_date: {
+        type: Date,
+        default: Date.now
+    },
+    publish_date: {
+        type: Date,
+        default: Date.now
+    },
+    client_name: {
+        type: String,
+        default: "",
+    },
+    location: {
+        type: String,
+        default: "",
+    },
+    day_rate: {
+        type: String,
+        default: "",
+    },
+    timerEnd: {
+        type: Date,
+        default: Date.now
+    },
+    applicants: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'JobApplication',
+    }]
+},{versionKey: false});
+
+JobSchema.pre('save', async function (next) {
+    if (!this.isNew) {
+        return next();
+    }
+    const now = new Date();
+    this.timerEnd = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    next();
+});
+
+export default mongoose.model('Job', JobSchema);

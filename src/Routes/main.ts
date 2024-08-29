@@ -4,6 +4,7 @@ import { deleteFiles, getModelData, uploadFile, downloadCsv } from '../Controlle
 import { multipleFileUpload } from '../Util/multer';
 import cardRoutes from './cardRoute';
 import clientRoutes from './clientRoute'
+import jobRouters from './jobRoute'
 import { paginationMiddleware } from '../Middleware/pagination';
 import userDBAcessRoutes from './databaseModelLogin';
 import { authorizeRolesWithoutErrorDB } from '../Middleware/verifyTokenDBAccess';
@@ -14,6 +15,7 @@ Routes.use("/user", userRoutes);
 Routes.use("/user", userDBAcessRoutes);
 Routes.use("/card", cardRoutes);
 Routes.use("/client", clientRoutes);
+Routes.use("/acr", jobRouters)
 
 Routes.post("/upload", multipleFileUpload('files', 5), uploadFile);
 Routes.delete("/upload/delete", deleteFiles);

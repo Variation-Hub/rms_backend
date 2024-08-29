@@ -506,3 +506,7 @@ export const downloadCsv = async (req: Request, res: Response) => {
         return res.status(500).send('Server Error');
     }
 };
+
+export const updateACRUser = async (req: Request, res: Response) => {
+    
+}
