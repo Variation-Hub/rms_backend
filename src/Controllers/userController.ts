@@ -512,21 +512,13 @@ export const downloadCsv = async (req: Request, res: Response) => {
     }
 };
 
-export const resetacrPassword = async (req: Request, res: Response) => {
-    
+export const resetacrPassword = async (req: any, res: Response) => {
+
     try {
-        const { token, password } = req.body;
+        const { password } = req.body;
+        const { email } = req.user
 
-        if (!token) {
-            return res.status(400).json({
-                message: "Token is required",
-                status: false,
-                data: null
-            });
-        }
-
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY as string) as any;
-        const user = await ACRUserModel.findOne({ email: decodedToken.email });
+        const user = await ACRUserModel.findOne({ personEmail: email });
 
         if (!user) {
             return res.status(404).json({
