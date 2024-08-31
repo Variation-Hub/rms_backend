@@ -1,4 +1,4 @@
-import { Request, response, Response } from "express"
+import e, { Request, response, Response } from "express"
 import userModel from "../Models/userModel"
 import referAndEarnModel from '../Models/referModel'
 import { generateToken } from "../Util/JwtAuth"
@@ -6,8 +6,9 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
+import { acrPasswordGeneratedMail, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
+import { generatePassword } from "../Util/passwordGenarator"
 const { Parser } = require('json2csv');
 
 const url = 'https://rms.saivensolutions.co.uk';
@@ -210,8 +211,12 @@ export const createACRUser = async (req: Request, res: Response) => {
             })
         }
 
-        const newUser = await ACRUserModel.create(req.body)
+        const password = generatePassword()
+        const newUser = await ACRUserModel.create({ ...req.body, password })
         const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
+
+        acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, email: newUser.personEmail, password });
+
         return res.status(200).json({
             message: "ACR User registartion success",
             status: true,
@@ -507,6 +512,87 @@ export const downloadCsv = async (req: Request, res: Response) => {
     }
 };
 
-export const updateACRUser = async (req: Request, res: Response) => {
+export const resetacrPassword = async (req: Request, res: Response) => {
     
+    try {
+        const { token, password } = req.body;
+
+        if (!token) {
+            return res.status(400).json({
+                message: "Token is required",
+                status: false,
+                data: null
+            });
+        }
+
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+        const user = await ACRUserModel.findOne({ email: decodedToken.email });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        user.password = password;
+        user.password_reset = true;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password has been reset successfully",
+            status: true,
+            data: null
+        });
+
+    } catch (err: any) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(400).json({
+                message: "Token has expired",
+                status: false,
+                data: null
+            });
+        }
+
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const updateACRUser = async (req: any, res: Response) => {
+    try {
+        const user_id = req.user;
+
+        const { appliedRole } = req.body;
+
+        const user = await ACRUserModel.findById(user_id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        user.appliedRole = appliedRole;
+        await user.save();
+
+        return res.status(200).json({
+            message: "User updated successfully",
+            status: true,
+            data: null
+        });
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
 }

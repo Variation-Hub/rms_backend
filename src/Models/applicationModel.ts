@@ -24,10 +24,7 @@ const JobApplication = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    cv: [{
-        type: mongoose.Schema.Types.Mixed,
-        default: {}
-    }]
+    cvDetails: [mongoose.Schema.Types.Mixed]
 }, { versionKey: false });
 
 export default mongoose.model('JobApplication', JobApplication);

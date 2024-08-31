@@ -3,6 +3,7 @@ import Job from '../Models/JobModel';
 import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
 import ACRUserModel from '../Models/ACRUserModel';
+import { activeRolesPostedMail, uploadCVAlertMail } from '../Util/nodemailer';
 
 // Create a new job
 export const createJob = async (req: Request, res: Response) => {
@@ -16,6 +17,31 @@ export const createJob = async (req: Request, res: Response) => {
         const job_id = `JD${String(counter?.seq).padStart(3, '0')}`;
 
         const newJob = await Job.create({ ...req.body, job_id });
+
+
+
+        const allAgengies: any = await ACRUserModel.find();
+
+        allAgengies.forEach((agent: any) => {
+            if (agent.personEmail) {
+                activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
+            }
+        });
+
+        //         ${ data.jobTitle }
+        //         ${ data.numOfRoles }
+        //         ${ data.startDate }
+        //         ${ data.publishedDate }
+        //         ${ data.clientName }
+        //         ${ data.location }
+        //         ${ data.dayRate }
+        // ${ data.pocName }
+        // ${ data.jobTitle }
+        // ${ data.companyName }
+        // ${ data.contactInfo }
+
+        //newJobAlertMail()
+
         return res.status(200).json({
             message: "Job created successfully",
             status: true,
@@ -72,7 +98,7 @@ export const getJobs = async (req: any, res: Response) => {
                 processedApplicantInfo = {
                     status: matchingApplicant.status,
                     no_of_resouces: matchingApplicant.no_of_resouces,
-                    cv: matchingApplicant.cv,
+                    cvDetails: matchingApplicant.cvDetails,
                     cv_timer_end: matchingApplicant.timer,
                     cv_time_left: cvTimeLeft
                 };
@@ -142,7 +168,7 @@ export const getJobById = async (req: any, res: Response) => {
             processedApplicantInfo = {
                 status: matchingApplicant.status,
                 no_of_resouces: matchingApplicant.no_of_resouces,
-                cv: matchingApplicant.cv,
+                cvDetails: matchingApplicant.cvDetails,
                 cv_timer_end: matchingApplicant.timer,
                 cv_time_left: cvTimeLeft
             };
@@ -268,8 +294,10 @@ export const applicationJob = async (req: Request, res: Response) => {
 
 export const applicationJobUpdate = async (req: Request, res: Response) => {
     try {
-        const { user_id, job_id, cv } = req.body;
+        const { user_id, job_id, cvDetails } = req.body;
         const application: any = await Application.findOne({ user_id, job_id });
+        const user: any = await ACRUserModel.findById(user_id);
+        const job: any = await Job.findById(job_id);
 
         if (application.status === "Not Submitted") {
             return res.status(400).json({
@@ -289,8 +317,10 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
         }
 
         application.status = "Under Review";
-        application.cv = cv;
+        application.cvDetails = cvDetails;
         await application.save();
+
+        uploadCVAlertMail(user?.personEmail, { role: job.job_title, clientName: job?.client_name, day_rate: job?.day_rate, position: job?.no_of_roles, roleType: job?.location })
 
         return res.status(200).json({
             message: 'Application status updated successfully',

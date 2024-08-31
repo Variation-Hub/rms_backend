@@ -5,12 +5,12 @@ import { authorizeRoles } from '../Middleware/verifyToken';
 
 const router = express.Router();
 
-router.post('/jobs', createJob);
-router.post('/apply-job', applicationJob)
-router.put('/apply-job', applicationJobUpdate)
+router.post('/jobs', authorizeRoles(), createJob);
+router.post('/apply-job', authorizeRoles(), applicationJob)
+router.put('/apply-job', authorizeRoles(), applicationJobUpdate)
 router.get('/jobs', authorizeRoles(), paginationMiddleware, getJobs);
 router.get('/jobs/:id', authorizeRoles(), getJobById);
-router.put('/jobs/:id', updateJob);
-router.delete('/jobs/:id', deleteJob);
+router.put('/jobs/:id', authorizeRoles(), updateJob);
+router.delete('/jobs/:id', authorizeRoles(), deleteJob);
 
 export default router;

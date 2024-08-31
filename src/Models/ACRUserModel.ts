@@ -77,6 +77,13 @@ const ACRUserModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
+    password_reset: {
+        type: Boolean,
+        default: false
+    },
+    appliedRole:[
+        mongoose.Schema.Types.Mixed,
+    ],
     createdAt: {
         type: Date,
         default: Date.now
