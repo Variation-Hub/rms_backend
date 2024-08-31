@@ -42,6 +42,11 @@ const JobSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    status:{
+        type: String,
+        enum:["Active", "Inactive"],
+        default: "Active"
+    },
     applicants: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'JobApplication',

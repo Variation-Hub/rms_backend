@@ -200,7 +200,11 @@ export const getJobById = async (req: any, res: Response) => {
 export const updateJob = async (req: Request, res: Response) => {
     try {
         const job = await Job.findOneAndUpdate({ job_id: req.params.id }, req.body, { new: true });
-        if (!job) return res.status(404).json({ message: "Job not found" });
+        if (!job) return res.status(404).json({
+            message: "Job not found",
+            status: false,
+            data: null
+        });
         return res.status(200).json({
             message: "Job updated successfully",
             status: true,
