@@ -9,6 +9,7 @@ import mongoose from "mongoose"
 import { acrPasswordGeneratedMail, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import { generatePassword } from "../Util/passwordGenarator"
+import adminModel from "../Models/adminModel"
 const { Parser } = require('json2csv');
 
 const url = 'https://rms.saivensolutions.co.uk';
@@ -257,6 +258,24 @@ export const loginACRUser = async (req: Request, res: Response) => {
             message: "ACR User login success",
             status: true,
             data: { token, user }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const getACRUsers = async (req: Request, res: Response) => {
+    try {
+        const users = await ACRUserModel.find();
+
+        return res.status(200).json({
+            message: "ACR Users fetch successfully",
+            status: true,
+            data: users
         });
     } catch (err: any) {
         return res.status(500).json({
@@ -580,6 +599,72 @@ export const updateACRUser = async (req: any, res: Response) => {
             data: null
         });
 
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const createAdmin = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body
+        const user = await adminModel.findOne({ email })
+
+        if (user) {
+            return res.status(400).json({
+                message: "Admin already exists",
+                status: false,
+                data: null
+            })
+        }
+
+        const newUser = await adminModel.create(req.body)
+        const token = generateToken({ _id: newUser._id, email: newUser.email })
+
+        return res.status(200).json({
+            message: "Admin registartion success",
+            status: true,
+            data: { token, user: newUser }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const loginAdmin = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body
+        const user = await adminModel.findOne({ email: email.toLowerCase() })
+
+        if (!user) {
+            return res.status(404).json({
+                message: "user not found",
+                status: false,
+                data: null
+            })
+        }
+
+        if (!(await comparepassword(password, user.password))) {
+            return res.status(400).json({
+                message: "please enter valid password",
+                status: false,
+                data: null
+            })
+        }
+
+        const token = generateToken({ _id: user._id, email: user.email })
+        return res.status(200).json({
+            message: "Admin login success",
+            status: true,
+            data: { token, user }
+        });
     } catch (err: any) {
         return res.status(500).json({
             message: err.message,

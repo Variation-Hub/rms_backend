@@ -10,7 +10,10 @@ import {
     referUser,
     getUser,
     updateACRUser,
-    resetacrPassword
+    resetacrPassword,
+    getACRUsers,
+    createAdmin,
+    loginAdmin
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -28,8 +31,13 @@ userRoutes.post("/refer", authorizeRoles(), referUser)
 //ACR user routes
 userRoutes.post("/acr/register", createACRUser);
 userRoutes.post("/acr/login", loginACRUser);
-userRoutes.patch("/acr/update", authorizeRoles(),  updateACRUser);
+userRoutes.patch("/acr/update", authorizeRoles(), updateACRUser);
 userRoutes.post("/acr/reset", authorizeRoles(), resetacrPassword)
+userRoutes.get("/acr/list", authorizeRoles(), getACRUsers)
+
+//Admin routes
+userRoutes.post("/admin/register", createAdmin);
+userRoutes.post("/admin/login", loginAdmin);
 
 
 export default userRoutes;
