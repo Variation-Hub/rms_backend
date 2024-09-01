@@ -301,7 +301,7 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
         const { user_id, job_id, cvDetails } = req.body;
         const application: any = await Application.findOne({ user_id, job_id });
         const user: any = await ACRUserModel.findById(user_id);
-        const job: any = await Job.findById(job_id);
+        const job: any = await Job.findOne({ job_id });
 
         if (application.status === "Not Submitted") {
             return res.status(400).json({
@@ -324,12 +324,12 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
         application.cvDetails = cvDetails;
         await application.save();
 
-        uploadCVAlertMail(user?.personEmail, { role: job.job_title, clientName: job?.client_name, day_rate: job?.day_rate, position: job?.no_of_roles, roleType: job?.location })
+        uploadCVAlertMail(user?.personEmail, { role: job?.job_title, clientName: job?.client_name, day_rate: job?.day_rate, position: job?.no_of_roles, roleType: job?.location })
 
         return res.status(200).json({
             message: 'Application status updated successfully',
             status: true,
-            data: application,
+            data: application
         });
 
     } catch (error: any) {
