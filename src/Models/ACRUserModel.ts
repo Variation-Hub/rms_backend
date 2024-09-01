@@ -11,6 +11,10 @@ const ACRUserModel = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profile: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
     location: {
         type: String,
         trim: true,

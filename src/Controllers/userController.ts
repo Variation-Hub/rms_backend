@@ -578,7 +578,7 @@ export const updateACRUser = async (req: any, res: Response) => {
     try {
         const user_id = req.user;
 
-        const { appliedRole } = req.body;
+        const { appliedRole, profile } = req.body;
 
         const user = await ACRUserModel.findById(user_id);
 
@@ -590,7 +590,8 @@ export const updateACRUser = async (req: any, res: Response) => {
             });
         }
 
-        user.appliedRole = appliedRole;
+        user.appliedRole = appliedRole || user?.appliedRole;
+        user.profile = profile || user?.profile;
         await user.save();
 
         return res.status(200).json({
