@@ -80,8 +80,31 @@ export const getJobs = async (req: any, res: Response) => {
                     foreignField: '_id', // The field in JobApplication that corresponds to those IDs
                     as: 'applicantsInfo' // Store the looked-up documents
                 }
+            },
+            {
+                $addFields: {
+                    sortStatus: {
+                        $cond: {
+                            if: { $eq: ["$status", "Active"] },
+                            then: 0,
+                            else: 1
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {
+                    sortStatus: 1, // Active (0) first, then Inactive (1)
+                    createAt: -1 // Latest first
+                }
+            },
+            {
+                $project: {
+                    sortStatus: 0 // Optionally remove the sortStatus field
+                }
             }
         ]);
+        
 
         // Process the aggregated results
         const jobsWithProcessedData = data.map((job: any) => {

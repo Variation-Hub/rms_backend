@@ -42,16 +42,25 @@ const JobSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    status:{
+    status: {
         type: String,
-        enum:["Active", "Inactive"],
+        enum: ["Active", "Inactive"],
         default: "Active"
     },
     applicants: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'JobApplication',
-    }]
-},{versionKey: false});
+    }],
+    upload: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+        }
+    },
+    createAt:{
+        type: Date,
+        default: Date.now
+    }
+}, { versionKey: false });
 
 JobSchema.pre('save', async function (next) {
     if (!this.isNew) {
