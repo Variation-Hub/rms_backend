@@ -47,7 +47,7 @@ export const createUser = async (req: Request, res: Response) => {
         await responseEmailSend({ name: req.body.name, email: newUser.email })
 
         return res.status(200).json({
-            message: "User registartion success",
+            message: "User registration success",     
             status: true,
             data: { token, user: newUser }
         });
