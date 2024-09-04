@@ -28,20 +28,6 @@ export const createJob = async (req: Request, res: Response) => {
             }
         });
 
-        //         ${ data.jobTitle }
-        //         ${ data.numOfRoles }
-        //         ${ data.startDate }
-        //         ${ data.publishedDate }
-        //         ${ data.clientName }
-        //         ${ data.location }
-        //         ${ data.dayRate }
-        // ${ data.pocName }
-        // ${ data.jobTitle }
-        // ${ data.companyName }
-        // ${ data.contactInfo }
-
-        //newJobAlertMail()
-
         return res.status(200).json({
             message: "Job created successfully",
             status: true,
@@ -62,10 +48,8 @@ export const getJobs = async (req: any, res: Response) => {
         const { page, limit, skip } = req.pagination!;
         const userId = req.user._id;
 
-        // Count total number of jobs
         const totalCount = await Job.find().countDocuments();
 
-        // Aggregate jobs with lookup to JobApplication collection
         const data = await Job.aggregate([
             {
                 $skip: skip
@@ -104,7 +88,7 @@ export const getJobs = async (req: any, res: Response) => {
                 }
             }
         ]);
-        
+
 
         // Process the aggregated results
         const jobsWithProcessedData = data.map((job: any) => {
@@ -114,7 +98,7 @@ export const getJobs = async (req: any, res: Response) => {
             // Filter applicants to check if the user ID matches
             const matchingApplicant = job.applicantsInfo.find((applicant: any) => applicant.user_id.toString() === userId.toString());
 
-            let processedApplicantInfo = {};
+            let processedApplicantInfo: any = {};
             if (matchingApplicant) {
                 const cvTimeLeft = Math.max(new Date(matchingApplicant.timer).getTime() - now.getTime(), 0);
 
@@ -139,7 +123,7 @@ export const getJobs = async (req: any, res: Response) => {
                 day_rate: job.day_rate,
                 applicants: job.applicants,
                 timerEnd: job.timerEnd,
-                job_time_left: jobTimeLeft,
+                job_time_left: processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: jobTimeLeft > 0 ? 'Active' : 'Expired',
                 ...processedApplicantInfo // Include the applicant info only if the user ID matches
             };
@@ -263,7 +247,7 @@ export const deleteJob = async (req: Request, res: Response) => {
 
 export const applicationJob = async (req: Request, res: Response) => {
     try {
-        const { user_id, job_id, applied = false, resources = 0 } = req.body;
+        const { user_id, job_id, applied = false, resources } = req.body;
 
         // Check if the user and job exist
         const user = await ACRUserModel.findById(user_id);
@@ -293,7 +277,7 @@ export const applicationJob = async (req: Request, res: Response) => {
         });
         if (applied) {
             application.status = 'Accepted'
-            application.no_of_resouces = resources
+            application.no_of_resouces = resources || application.no_of_resouces
             const now = new Date();
             application.timer = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
