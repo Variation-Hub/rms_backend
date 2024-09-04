@@ -168,7 +168,7 @@ export const getJobById = async (req: any, res: Response) => {
         // Filter for the matching applicant based on the user ID
         const matchingApplicant = applicantsInfo.find((applicant: any) => applicant.user_id.toString() === userId.toString());
 
-        let processedApplicantInfo = {};
+        let processedApplicantInfo: any = {};
         if (matchingApplicant) {
             const cvTimeLeft = Math.max(new Date(matchingApplicant.timer).getTime() - now.getTime(), 0);
 
@@ -183,8 +183,8 @@ export const getJobById = async (req: any, res: Response) => {
 
         const jobWithTimeLeft = {
             ...job,
-            job_time_left: jobTimeLeft,
-            status: jobTimeLeft > 0 ? 'Active' : 'Expired',
+            job_time_left: job.status === "Inactive" ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
+            status: job.status === "Inactive" ? "Inactive" : jobTimeLeft > 0 ? 'Active' : 'Expired',
             ...processedApplicantInfo
         };
 
