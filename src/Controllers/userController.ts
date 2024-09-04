@@ -219,7 +219,7 @@ export const createACRUser = async (req: Request, res: Response) => {
         acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, email: newUser.personEmail, password });
 
         return res.status(200).json({
-            message: "ACR User registartion success",
+            message: "ACR User registration success",
             status: true,
             data: { token, user: newUser }
         });
@@ -626,7 +626,7 @@ export const createAdmin = async (req: Request, res: Response) => {
         const token = generateToken({ _id: newUser._id, email: newUser.email })
 
         return res.status(200).json({
-            message: "Admin registartion success",
+            message: "Admin registration success",  
             status: true,
             data: { token, user: newUser }
         });

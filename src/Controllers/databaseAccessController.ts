@@ -18,7 +18,7 @@ export const registerUserDBUser = async (req: Request, res: Response) => {
         const newUser = await userDBAcessModel.create(req.body)
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, accessDB: true })
         return res.status(200).json({
-            message: "User registartion success",
+            message: "User registration success",
             status: true,
             data: { token, user: newUser }
         });
