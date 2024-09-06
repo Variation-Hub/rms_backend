@@ -178,23 +178,13 @@ export const acrPasswordGeneratedMailTemplate = (data: any) => {
        <div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
-                <p>Thank you for registering with us! We are pleased to inform you that your account has been successfully created in our Agency Capacity Record System.</p>
-                <p>Below are your login details:</p>
-                <ul>
-                  <li><strong>Username (Email ID):</strong> ${data.email}</li>
-                  <li><strong>System-Generated Password:</strong> ${data.password}</li>
-                </ul>
-                <p>To get started, please log in to your portal, where you can access all the information, update your profile, and apply for opportunities in UK Public Sector Contracts with us.</p>
-                <p>To access the system, please click on the button below:</p>
-                <a href="${data.link}" style="display: inline-block; font-weight:bold;">Login to Agency Capacity Record System</a>
-                <p><strong>Important:</strong> It is mandatory to change your password upon your first login to ensure the security of your account.</p>
-                <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
-                <p>We look forward to working with you.</p>
+                <p>Thank you for registering with SaiVen's Agency Candidate Record (ACR) system. We’re excited to have you as part of our recruitment partner network!<p>
+                <p>Your registration has been successfully received, and our team will review your profile shortly. We will get back to you once the review is complete to confirm the next steps.</p>
+                <p>In the meantime, if you have any questions or need assistance, please don't hesitate to reach out at <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:#467886;">jamie.thompson@saivensolutions.co.uk</a>.</p>
+                <p>Thank you again for partnering with us, and we look forward to working together.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    <b>Jamie Thompson</b><br>
-                    <b>Recruitment Lead</b><br>
-                    SaiVen Technology Solutions</p>
+                    SaiVen Technology Solutions Team</p>
                 </div>
             </div>
         </div>`

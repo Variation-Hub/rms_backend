@@ -109,7 +109,7 @@ export async function acrPasswordGeneratedMail(reciverEmail: string, data: any) 
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "Welcome to the Agency Capacity Record System - Your Login Details Enclosed", // Subject line
+            subject: "Thank You for Registering with SaiVen ACR System", // Subject line
             text: ``, // plain text body
             html: acrPasswordGeneratedMailTemplate(data), // html body
         });
