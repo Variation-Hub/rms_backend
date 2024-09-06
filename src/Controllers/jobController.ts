@@ -52,12 +52,6 @@ export const getJobs = async (req: any, res: Response) => {
 
         const data = await Job.aggregate([
             {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            },
-            {
                 $lookup: {
                     from: 'jobapplications', // The JobApplication collection
                     localField: 'applicants', // Job applicants' IDs
@@ -73,12 +67,20 @@ export const getJobs = async (req: any, res: Response) => {
                             then: 0,
                             else: 1
                         }
+                    },
+                    sortInactiveStatus: {
+                        $cond: {
+                            if: { $eq: ["$status", "Inactive"] },
+                            then: 0,
+                            else: 1
+                        }
                     }
-                }
+                },
             },
             {
                 $sort: {
                     sortStatus: 1, // Active (0) first, then Inactive (1)
+                    sortInactiveStatus: -1,
                     createAt: -1 // Latest first
                 }
             },
@@ -87,7 +89,7 @@ export const getJobs = async (req: any, res: Response) => {
                     sortStatus: 0 // Optionally remove the sortStatus field
                 }
             }
-        ]);
+        ]).skip(skip).limit(limit);
 
 
         // Process the aggregated results
