@@ -198,7 +198,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                 <p>We have just posted new active roles in our Agency Capacity Record System, and your prompt response is required.</p>
                 <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within 2 hours. Additionally, please upload the CVs within 24 hours of confirming.</p>
                 <p>Access the System Here:
-                <a href="${data.link}" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
+                <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p><strong>Important:</strong> The posted jobs will only be valid for 2 hours, so please respond within this timeframe.</p>
                 <p><strong>Steps to Confirm:</strong></p>
@@ -267,7 +267,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 </ul>
                 
                 <p> <b>Upload CV(s) Here:</b>
-                <a href="${data.link}" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
+                <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not respond within the given timeframe, your application to supply candidates for these roles will be impacted.</p>
                 <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
