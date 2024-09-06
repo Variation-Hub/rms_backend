@@ -8,7 +8,6 @@ import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
 import { acrPasswordGeneratedMail, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
-import { generatePassword } from "../Util/passwordGenarator"
 import adminModel from "../Models/adminModel"
 const { Parser } = require('json2csv');
 
@@ -212,7 +211,7 @@ export const createACRUser = async (req: Request, res: Response) => {
             })
         }
 
-        const password = "Rms@123"
+        const password = "S1@3&*Jh"
         const newUser = await ACRUserModel.create({ ...req.body, password })
         const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
 

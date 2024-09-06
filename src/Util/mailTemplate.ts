@@ -208,14 +208,13 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                     <li>Select the Active Role.</li>
                     <li>Mark "Yes" or "No" for each role.</li>
                     <li>Confirm the number of candidates you can supply.</li>
+                    <li>Submit.</li>
                 </ol>
                 <p>Please note that if you do not respond within the given timeframe, your ability to supply candidates for these roles will be impacted.</p>
                 <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    <b>Jamie Thompson</b><br>
-                    <b>Recruitment Lead</b><br>
                     SaiVen Technology Solutions</p>
                 </div>
             </div>
@@ -232,28 +231,19 @@ export const newJobAlertMailTemplate = (data: any) => {
                     <tr style="background-color: #f2f2f2;">
                         <th style="border: 1px solid #ddd; text-align: left;">Job Title</th>
                         <th style="border: 1px solid #ddd; text-align: left;">No. of Roles</th>
-                        <th style="border: 1px solid #ddd; text-align: left;">Position Start Date</th>
                         <th style="border: 1px solid #ddd; text-align: left;">Published Date</th>
-                        <th style="border: 1px solid #ddd; text-align: left;">Client Name</th>
-                        <th style="border: 1px solid #ddd; text-align: left;">Location</th>
                         <th style="border: 1px solid #ddd; text-align: left;">Day Rate</th>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd;">${data.jobTitle}</td>
                         <td style="border: 1px solid #ddd;">${data.numOfRoles}</td>
-                        <td style="border: 1px solid #ddd;">${data.startDate}</td>
                         <td style="border: 1px solid #ddd;">${data.publishedDate}</td>
-                        <td style="border: 1px solid #ddd;">${data.clientName}</td>
-                        <td style="border: 1px solid #ddd;">${data.location}</td>
                         <td style="border: 1px solid #ddd;">${data.dayRate}</td>
                     </tr>
                 </table>
                 <p>Please review the job details and take the necessary actions as soon as possible. If you require any further information, feel free to reach out.</p>
                 <p>Best regards,<br>
-                <b>${data.pocName}</b><br>
-                <b>${data.jobTitle}</b><br>
-                ${data.companyName}<br>
-                ${data.contactInfo}</p>
+                <b>ACR Portal</p>
             </div>
         </div>
  `
@@ -263,8 +253,8 @@ export const uploadCVAlertMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
-                <p>Thank you for confirming your capacity to supply candidates for the role of [Job Role] in our Agency Capacity Record System.</p>
-                <p>As a next step, please upload the CV(s) of the candidates you have confirmed for this role within 24 hours of your confirmation through our portal.</p>
+                <p>Thank you for confirming your capacity to supply candidates for the role of <b>${data.role}</b> in our Agency Capacity Record System.</p>
+                <p>As a next step, please <b>upload the CV(s)</b> of the candidates you have confirmed for this role within <b>24 hours</b> of your confirmation through our portal.</p>
                 
                 <p><strong>Role Details:</strong></p>
                 <ul>
@@ -276,7 +266,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                     
                 </ul>
                 
-                <p>Upload CV(s) Here:
+                <p> <b>Upload CV(s) Here:</b>
                 <a href="${data.link}" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not respond within the given timeframe, your application to supply candidates for these roles will be impacted.</p>
@@ -284,8 +274,6 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    <b>Jamie Thompson</b><br>
-                    <b>Recruitment Lead</b><br>
                     SaiVen Technology Solutions</p>
                 </div>
             </div>
@@ -296,7 +284,7 @@ export const cvRecivedMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
-                <p>We have successfully received the CV(s) you uploaded for the role of [Job Role] in our Agency Capacity Record System.</p>
+                <p>We have successfully received the CV(s) you uploaded for the role of <b>${data.role}</b> in our Agency Capacity Record System.</p>
                 
                 <p><strong>Role Details:</strong></p>
                 <ul>
@@ -313,8 +301,6 @@ export const cvRecivedMailTemplate = (data: any) => {
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    <b>Jamie Thompson</b><br>
-                    <b>Recruitment Lead</b><br>
                     SaiVen Technology Solutions</p>
                 </div>
             </div>
@@ -341,10 +327,8 @@ export const cvReviewMailTemplate = (data: any) => {
              
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    <b>${data.name}</b><br>
-                    <b>${data.job_title}</b><br>
-                    <b>${data.company}</b><br>
-                    <b>${data.contact}</p>
+                    ACR Portal
+                    </p>
                 </div>
             </div>
         </div>`

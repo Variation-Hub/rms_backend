@@ -147,7 +147,7 @@ export async function newJobAlertMail(reciverEmail: string, data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "agent.personEmail", // Subject line
+            subject: "New Job Posted in the System - Action Required", // Subject line
             text: ``, // plain text body
             html: newJobAlertMailTemplate(data), // html body
         });
@@ -166,8 +166,8 @@ export async function uploadCVAlertMail(reciverEmail: string, data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "New User Registration Alert - ACR System", // Subject line
-            text: `New User Registration Name is ${data.name} and Email is ${data.email}`, // plain text body
+            subject: "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours", // Subject line
+            text: ``, // plain text body
             html: uploadCVAlertMailTemplate(data), // html body
         });
 
@@ -185,8 +185,8 @@ export async function cvRecivedMail(reciverEmail: string, data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "New User Registration Alert - ACR System", // Subject line
-            text: `New User Registration Name is ${data.name} and Email is ${data.email}`, // plain text body
+            subject: "Confirmation: CV(s) Successfully Submitted", // Subject line
+            text: ``, // plain text body
             html: cvRecivedMailTemplate(data), // html body
         });
 
@@ -204,8 +204,8 @@ export async function cvReviewMail(reciverEmail: string, data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "New User Registration Alert - ACR System", // Subject line
-            text: `New User Registration Name is ${data.name} and Email is ${data.email}`, // plain text body
+            subject: "CVs Uploaded – Vetting Process Initiation", // Subject line
+            text: ``, // plain text body
             html: cvReviewMailTemplate(data), // html body
         });
 

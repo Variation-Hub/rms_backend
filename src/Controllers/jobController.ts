@@ -3,7 +3,9 @@ import Job from '../Models/JobModel';
 import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
 import ACRUserModel from '../Models/ACRUserModel';
-import { activeRolesPostedMail, uploadCVAlertMail } from '../Util/nodemailer';
+import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
+
+const emailSend = 'ayushsinghraj3535@gmail.com';
 
 // Create a new job
 export const createJob = async (req: Request, res: Response) => {
@@ -18,8 +20,6 @@ export const createJob = async (req: Request, res: Response) => {
 
         const newJob = await Job.create({ ...req.body, job_id });
 
-
-
         const allAgengies: any = await ACRUserModel.find();
 
         allAgengies.forEach((agent: any) => {
@@ -27,6 +27,7 @@ export const createJob = async (req: Request, res: Response) => {
                 activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
             }
         });
+        newJobAlertMail('ayush@westgateithub.com', { jobTitle: req.body?.job_title, numOfRoles: req.body?.no_of_roles, publishedDate: req.body?.publish_date, dayRate: req.body?.day_rate })
 
         return res.status(200).json({
             message: "Job created successfully",
@@ -291,6 +292,15 @@ export const applicationJob = async (req: Request, res: Response) => {
         job.applicants.push(data._id);
         await job.save();
 
+        uploadCVAlertMail(user?.personEmail, {
+            name: user?.agencyName,
+            role: job?.job_title,
+            day_rate: job?.day_rate,
+            clientName: job?.client_name,
+            position: resources,
+            roleType: user?.location
+        })
+
         return res.status(200).json({
             message: 'Application submitted successfully',
             status: true,
@@ -333,7 +343,32 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
         application.cvDetails = cvDetails;
         await application.save();
 
-        uploadCVAlertMail(user?.personEmail, { role: job?.job_title, clientName: job?.client_name, day_rate: job?.day_rate, position: job?.no_of_roles, roleType: job?.location })
+        if (application?.no_of_resouces === application?.cvDetails.length) {
+            cvRecivedMail(user?.personEmail, {
+                name: user?.agencyName,
+                role: job?.job_title,
+                clientName: job?.client_name,
+                day_rate: job?.day_rate,
+                position: job?.no_of_roles,
+                roleType: job?.location
+            })
+
+            const today = new Date();
+
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+
+            const formattedDate = `${year}-${month}-${day}`;
+
+            cvReviewMail(emailSend, {
+                title: job?.job_title,
+                clientName: job?.client_name,
+                cv_count: application?.cvDetails.length,
+                uploadeBy: user?.agencyName,
+                date: formattedDate
+            })
+        }
 
         return res.status(200).json({
             message: 'Application status updated successfully',
