@@ -196,7 +196,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
                 <p>We have just posted new active roles in our Agency Capacity Record System, and your prompt response is required.</p>
-                <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within 2 hours. Additionally, please upload the CVs within 24 hours of confirming.</p>
+                <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within <b>2 hours</b>. Additionally, please upload the CVs within 24 hours of confirming.</p>
                 <p>Access the System Here:
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>

@@ -1,3 +1,4 @@
+import path from "path";
 import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, cvRecivedMailTemplate, cvReviewMailTemplate, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, inviteLoginEmail, newJobAlertMailTemplate, referViaCode, uploadCVAlertMailTemplate } from "./mailTemplate";
 
 const nodemailer = require('nodemailer');
@@ -150,6 +151,12 @@ export async function newJobAlertMail(reciverEmail: string, data: any) {
             subject: "New Job Posted in the System - Action Required", // Subject line
             text: ``, // plain text body
             html: newJobAlertMailTemplate(data), // html body
+            attachments: [
+                {
+                    filename: 'Read me.docx',            // Name of the file to attach
+                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                },
+            ],
         });
 
         return true;
@@ -169,6 +176,12 @@ export async function uploadCVAlertMail(reciverEmail: string, data: any) {
             subject: "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours", // Subject line
             text: ``, // plain text body
             html: uploadCVAlertMailTemplate(data), // html body
+            attachments: [
+                {
+                    filename: 'Read me_Jobtitle_JobCode.docx',            // Name of the file to attach
+                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                },
+            ],
         });
 
         return true;
@@ -207,6 +220,12 @@ export async function cvReviewMail(reciverEmail: string, data: any) {
             subject: "CVs Uploaded – Vetting Process Initiation", // Subject line
             text: ``, // plain text body
             html: cvReviewMailTemplate(data), // html body
+            attachments: [
+                {
+                    filename: 'Read me.docx',            // Name of the file to attach
+                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                },
+            ],
         });
 
         return true;
