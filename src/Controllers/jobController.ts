@@ -339,7 +339,7 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
             return;
         }
 
-        application.status = "Under Review";
+        application.status = application?.no_of_resouces === application?.cvDetails.length ? "Under Review" : "Partially Uploaded";
         application.cvDetails = cvDetails;
         await application.save();
 
