@@ -211,7 +211,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                     <li>Submit.</li>
                 </ol>
                 <p>Please note that if you do not respond within the given timeframe, your ability to supply candidates for these roles will be impacted.</p>
-                <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
@@ -270,7 +270,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not respond within the given timeframe, your application to supply candidates for these roles will be impacted.</p>
-                <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
@@ -297,7 +297,7 @@ export const cvRecivedMailTemplate = (data: any) => {
                 </ul>
                 
                 <p>Thank you for your prompt response and submission of the CVs. Our team will review the CV(s) and get back to you if any further information or action is needed.</p>
-                <p>If you have any questions or need assistance, please feel free to reach out to me at <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
