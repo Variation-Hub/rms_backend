@@ -11,6 +11,10 @@ const JobApplication = new mongoose.Schema({
         ref: 'Job',
         required: true
     },
+    applied:{
+        type: Boolean,
+        default: false
+    },
     timer: {
         type: Date,
         default: Date.now

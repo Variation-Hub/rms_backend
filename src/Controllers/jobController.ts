@@ -276,7 +276,8 @@ export const applicationJob = async (req: Request, res: Response) => {
 
         const application = await Application.create({
             user_id,
-            job_id
+            job_id,
+            applied
         });
         if (applied) {
             application.status = 'Accepted'
