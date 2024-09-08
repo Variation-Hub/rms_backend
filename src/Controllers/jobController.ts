@@ -127,7 +127,7 @@ export const getJobs = async (req: any, res: Response) => {
                 day_rate: job.day_rate,
                 applicants: job.applicants,
                 timerEnd: job.timerEnd,
-                job_time_left: job.status === "Inactive" ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
+                job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: job.status === "Inactive" ? "Inactive" : jobTimeLeft > 0 ? 'Active' : 'Expired',
                 ...processedApplicantInfo // Include the applicant info only if the user ID matches
             };
