@@ -18,7 +18,7 @@ const JobApplication = new mongoose.Schema({
     status: {
         type: String,
         default: 'Active',
-        enum: ['Active', 'Accepted', 'Under Review', 'Expired', 'Actioned', 'Not Submitted', 'Inactive', 'Submitted']
+        enum: ['Active', 'Accepted', 'Under Review', 'Expired', 'Actioned', 'Not Submitted', 'Inactive', 'Submitted', 'Partially Uploaded']
     },
     no_of_resouces: {
         type: Number,

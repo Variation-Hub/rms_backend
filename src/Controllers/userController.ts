@@ -673,3 +673,48 @@ export const loginAdmin = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const forgotACRUserPassword = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const user: any = await ACRUserModel.findOne({ personEmail: email.toLowerCase() });
+        if (!user) {
+            return res.status(404).json({
+                message: "ACR User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        const token = jwt.sign(
+            { email: user.personEmail, name: user.agencyName },
+            process.env.SECRET_KEY as string,
+            { expiresIn: '10m' }
+        );
+
+        const resetLink = `${url}/#/arc/arc-reset-password?token=${token}`;
+
+        const response = await forgotEmailSend({ newCandidateName: user.agencyName, email: user.personEmail, link: resetLink });
+
+        if (response) {
+            return res.status(200).json({
+                message: "Password reset link sent to your email",
+                status: true,
+                data: null
+            });
+        } else {
+            return res.status(500).json({
+                message: "Failed to send password reset link",
+                status: false,
+                data: null
+            });
+        }
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
