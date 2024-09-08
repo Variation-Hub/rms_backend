@@ -110,6 +110,7 @@ export const getJobs = async (req: any, res: Response) => {
                     no_of_resouces: matchingApplicant.no_of_resouces,
                     cvDetails: matchingApplicant.cvDetails,
                     cv_timer_end: matchingApplicant.timer,
+                    applied: matchingApplicant.applied,
                     cv_time_left: matchingApplicant.status === "Under Review" ? 0 : cvTimeLeft
                 };
             }
