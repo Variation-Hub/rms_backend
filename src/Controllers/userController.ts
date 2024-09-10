@@ -692,7 +692,7 @@ export const forgotACRUserPassword = async (req: Request, res: Response) => {
             { expiresIn: '10m' }
         );
 
-        const resetLink = `${url}/#/arc/arc-reset-password?token=${token}`;
+        const resetLink = `${url}/#/acr/acr-reset-password?token=${token}`;
 
         const response = await forgotEmailSend({ newCandidateName: user.agencyName, email: user.personEmail, link: resetLink });
 
