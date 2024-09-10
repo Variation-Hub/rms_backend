@@ -178,13 +178,13 @@ export const acrPasswordGeneratedMailTemplate = (data: any) => {
        <div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
-                <p>Thank you for registering with SaiVen's Agency Candidate Record (ACR) system. We’re excited to have you as part of our recruitment partner network!<p>
+                <p>Thank you for registering with SaiVen's Agency Capacity Record (ACR) system. We’re excited to have you as part of our recruitment partner network!<p>
                 <p>Your registration has been successfully received, and our team will review your profile shortly. We will get back to you once the review is complete to confirm the next steps.</p>
-                <p>In the meantime, if you have any questions or need assistance, please don't hesitate to reach out at <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:#467886;">jamie.thompson@saivensolutions.co.uk</a>.</p>
+                <p>In the meantime, if you have any questions or need assistance, please don't hesitate to reach out to <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:#467886;">jamie.thompson@saivensolutions.co.uk</a>.</p>
                 <p>Thank you again for partnering with us, and we look forward to working together.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    SaiVen Technology Solutions Team</p>
+                    SaiVen Technology Solutions</p>
                 </div>
             </div>
         </div>`
@@ -241,7 +241,7 @@ export const newJobAlertMailTemplate = (data: any) => {
                         <td style="border: 1px solid #ddd;">${data.dayRate}</td>
                     </tr>
                 </table>
-                <p>Please review the job details and take the necessary actions as soon as possible. If you require any further information, feel free to reach out.</p>
+                <p>Please review the job details and take the necessary actions as soon as possible.</p>
                 <p>Best regards,<br>
                 <b>ACR Portal</p>
             </div>
@@ -262,7 +262,6 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                     <li><b>Client Name:</b> ${data.clientName}</li>
                     <li><b>Day Rate:</b> ${data.day_rate}</li>
                     <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
-                    <li><b>Role Type:</b> ${data.roleType}</li>
                     
                 </ul>
                 
@@ -270,6 +269,14 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not respond within the given timeframe, your application to supply candidates for these roles will be impacted.</p>
+                <p><strong>Steps to Upload CV:</strong></p>
+                <ol>
+                    <li>Log in to the System.</li>
+                    <li>Navigate to the "All Roles" Section.</li>
+                    <li>Click the Upload CV Button for this Role.</li>
+                    <li>Upload all your CVs.</li>
+                    <li>Submit.</li>
+                </ol>
                 <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
@@ -284,21 +291,18 @@ export const cvRecivedMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
-                <p>We have successfully received the CV(s) you uploaded for the role of <b>${data.role}</b> in our Agency Capacity Record System.</p>
+                <p>We have successfully received the CVs you uploaded for the role of <b>${data.role}</b> in our Agency Capacity Record System.</p>
                 
                 <p><strong>Role Details:</strong></p>
                 <ul>
                     <li><b>Job Role:</b> ${data.role}</li>
                     <li><b>Client Name:</b> ${data.clientName}</li>
                     <li><b>Day Rate:</b> ${data.day_rate}</li>
-                    <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
-                    <li><b>Role Type:</b> ${data.roleType}</li>
-                    
+                    <li><b>No. of Positions you confirmed</b> ${data.position}</li>                    
                 </ul>
                 
-                <p>Thank you for your prompt response and submission of the CVs. Our team will review the CV(s) and get back to you if any further information or action is needed.</p>
-                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
-                <p>Thank you for your immediate attention.</p>
+                <p>Thank you for your prompt response and submission of the CVs. Our team will review the CVs and get back to you if any further information or action is needed.</p>
+                <p>If you have more CVs to submit , please attach and send them to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
                     SaiVen Technology Solutions</p>
@@ -311,7 +315,7 @@ export const cvReviewMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear HR Team,</b></p>
-                <p>We have received the CVs for the recently posted role(s). Please find the confirmation below:</p>
+                <p>We have received the CVs for the recently posted role of ${data.title}. Please find the confirmation below:</p>
                 
                 <ul>
                     <li><b>Job Title:</b> ${data.title}</li>

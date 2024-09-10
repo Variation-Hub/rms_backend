@@ -198,7 +198,7 @@ export async function cvRecivedMail(reciverEmail: string, data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "Confirmation: CV(s) Successfully Submitted", // Subject line
+            subject: "Confirmation: CVs Successfully Submitted", // Subject line
             text: ``, // plain text body
             html: cvRecivedMailTemplate(data), // html body
         });
