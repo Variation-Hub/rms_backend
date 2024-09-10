@@ -351,7 +351,7 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
                 role: job?.job_title,
                 clientName: job?.client_name,
                 day_rate: job?.day_rate,
-                position: job?.no_of_roles,
+                position: application?.no_of_resouces,
                 roleType: job?.location
             })
 
