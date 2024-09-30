@@ -5,9 +5,8 @@ import Counter from './JobCounter';
 const JobSchema = new mongoose.Schema({
     job_id: {
         type: String,
-        required: true,
-        unique: true,
         trim: true,
+        default: ""
     },
     job_title: {
         type: String,
