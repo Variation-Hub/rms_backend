@@ -2,7 +2,7 @@ export const generatePassword = (length = 8) => {
     const upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz';
     const numbers = '0123456789';
-    const specialChars = '!@#$&()[]{}<>?';
+    const specialChars = '@#';
     
     if (length < 4) {
         throw new Error('Password length must be at least 4 to include all required characters.');

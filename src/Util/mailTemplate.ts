@@ -337,3 +337,50 @@ export const cvReviewMailTemplate = (data: any) => {
             </div>
         </div>`
 }
+
+export const adminMailTemplate = (data: any) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear Admin</b></p>
+                <p>We would like to inform you that the following agency has successfully completed the ACR Registration:</p>
+                
+                <ul>
+                    <li><b>Agency Name:</b> ${data.agencyName}</li>
+                    <li><b>Primary Contact:</b> ${data.name}</li>
+                    <li><b>Email:</b> ${data.email}</li>
+                    <li><b>Phone:</b> ${data.phone}</li>
+                    
+                </ul>
+                
+                <p>Please review the details and take the necessary actions.<br/></p>
+             
+                <div style="margin-top: 20px;">
+                    <p>Thank you.</p>
+                </div>
+            </div>
+        </div>`
+}
+
+export const adminMailWithPhoneTemplate = (data: any) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear Admin</b></p>
+                <p>We are pleased to inform you that an agency has successfully completed the registration process. Below are the login credentials and primary contact details for the agency:</p>
+                
+                <ul>
+                    <li><b>Agency Name:</b> ${data.agencyName}</li>
+                    <li><b>Password:</b> ${data.password}</li>
+                    <li><b>Primary Contact:</b> ${data.name}</li>
+                    <li><b>Email:</b> ${data.email}</li>
+                    <li><b>Phone:</b> ${data.phone}</li>
+                    
+                </ul>
+                
+                <p>Please ensure the details are securely shared with the respective agency.<br/></p>
+             
+                <div style="margin-top: 20px;">
+                    <p>Thank you.</p>
+                </div>
+            </div>
+        </div>`
+}

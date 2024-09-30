@@ -7,28 +7,50 @@ import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, newJobAlertMail, up
 
 const emailSend = 'ayushsinghraj3535@gmail.com';
 
+export const fetchJobId = async (req: Request, res: Response) => {
+    try {
+        const counter: any = await Counter.findOne();
+        const job_id = `JD${String(counter?.seq + 1).padStart(3, '0')}`;
+        return res.status(200).json({
+            message: "JobID Fetched",
+            status: true,
+            data: {
+                job_id
+            }
+        })
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
 // Create a new job
 export const createJob = async (req: Request, res: Response) => {
     try {
-        const counter = await Counter.findOneAndUpdate(
-            {},
-            { $inc: { seq: 1 } },
-            { new: true, upsert: true }
-        );
+        const status = req?.body?.status;
 
-        const job_id = `JD${String(counter?.seq).padStart(3, '0')}`;
+        if (status === 'Active') {
+            await Counter.findOneAndUpdate(
+                {},
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true }
+            );
+        }
 
-        const newJob = await Job.create({ ...req.body, job_id });
+        const newJob = await Job.create({ ...req.body });
 
         const allAgengies: any = await ACRUserModel.find();
 
-        allAgengies.forEach((agent: any) => {
-            if (agent.personEmail) {
-                activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
-            }
-        });
-        newJobAlertMail('ayush@westgateithub.com', { jobTitle: req.body?.job_title, numOfRoles: req.body?.no_of_roles, publishedDate: req.body?.publish_date, dayRate: req.body?.day_rate })
-
+        if (status === 'Active') {
+            allAgengies.forEach((agent: any) => {
+                if (agent.personEmail) {
+                    activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
+                }
+            });
+            newJobAlertMail('ayush@westgateithub.com', { jobTitle: req.body?.job_title, numOfRoles: req.body?.no_of_roles, publishedDate: req.body?.publish_date, dayRate: req.body?.day_rate })
+        }
         return res.status(200).json({
             message: "Job created successfully",
             status: true,

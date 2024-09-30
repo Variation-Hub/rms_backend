@@ -6,9 +6,10 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrPasswordGeneratedMail, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
+import { acrPasswordGeneratedMail, adminMail, adminMailWithPassword, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
+import { generatePassword } from "../Util/passwordGenarator"
 const { Parser } = require('json2csv');
 
 const url = 'https://rms.saivensolutions.co.uk';
@@ -198,6 +199,8 @@ export const deleteFiles = async (req: Request, res: Response) => {
     }
 }
 
+
+
 export const createACRUser = async (req: Request, res: Response) => {
     try {
         const { personEmail } = req.body
@@ -211,11 +214,17 @@ export const createACRUser = async (req: Request, res: Response) => {
             })
         }
 
-        const password = "S1@3&*Jh"
+        const password = generatePassword();
         const newUser = await ACRUserModel.create({ ...req.body, password })
         const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
 
         acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName });
+
+        ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk"]?.forEach((item: string) => {
+            adminMail(item, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber })
+        })
+
+        adminMailWithPassword("ayush@westgateithub.com", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
 
         return res.status(200).json({
             message: "ACR User registration success",
