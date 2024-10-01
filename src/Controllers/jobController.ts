@@ -49,7 +49,14 @@ export const createJob = async (req: Request, res: Response) => {
                     activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
                 }
             });
-            newJobAlertMail('ayush@westgateithub.com', { jobTitle: req.body?.job_title, numOfRoles: req.body?.no_of_roles, publishedDate: req.body?.publish_date, dayRate: req.body?.day_rate })
+            newJobAlertMail('ayush@westgateithub.com', {
+                jobTitle: req.body?.job_title,
+                numOfRoles: req.body?.no_of_roles,
+                publishedDate: req.body?.publish_date,
+                dayRate: req.body?.day_rate,
+                filename: newJob?.upload?.key,
+                url: newJob?.upload?.url
+            })
         }
         return res.status(200).json({
             message: "Job created successfully",
@@ -322,7 +329,9 @@ export const applicationJob = async (req: Request, res: Response) => {
             day_rate: job?.day_rate,
             clientName: job?.client_name,
             position: resources,
-            roleType: user?.location
+            roleType: user?.location,
+            filename: job?.upload?.key,
+            url: job?.upload?.url
         })
 
         return res.status(200).json({
@@ -390,7 +399,9 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
                 clientName: job?.client_name,
                 cv_count: application?.cvDetails.length,
                 uploadeBy: user?.agencyName,
-                date: formattedDate
+                date: formattedDate,
+                filename: job?.upload?.key,
+                url: job?.upload?.url
             })
         }
 

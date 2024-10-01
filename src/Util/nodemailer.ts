@@ -153,8 +153,8 @@ export async function newJobAlertMail(reciverEmail: string, data: any) {
             html: newJobAlertMailTemplate(data), // html body
             attachments: [
                 {
-                    filename: 'Read me.docx',            // Name of the file to attach
-                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                    filename: data.filename.substring(data.filename.indexOf('_') + 1),            // Name of the file to attach
+                    path: data.url, // Path to the file
                 },
             ],
         });
@@ -178,8 +178,8 @@ export async function uploadCVAlertMail(reciverEmail: string, data: any) {
             html: uploadCVAlertMailTemplate(data), // html body
             attachments: [
                 {
-                    filename: 'Read me_Jobtitle_JobCode.docx',            // Name of the file to attach
-                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                    filename: data.filename.substring(data.filename.indexOf('_') + 1),            // Name of the file to attach
+                    path: data.url, // Path to the file
                 },
             ],
         });
@@ -222,8 +222,8 @@ export async function cvReviewMail(reciverEmail: string, data: any) {
             html: cvReviewMailTemplate(data), // html body
             attachments: [
                 {
-                    filename: 'Read me.docx',            // Name of the file to attach
-                    path: path.join(__dirname, 'readme.docx'), // Path to the file
+                    filename: data.filename.substring(data.filename.indexOf('_') + 1),            // Name of the file to attach
+                    path: data.url, // Path to the file
                 },
             ],
         });
