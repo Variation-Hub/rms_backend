@@ -218,11 +218,11 @@ export const createACRUser = async (req: Request, res: Response) => {
         const newUser = await ACRUserModel.create({ ...req.body, password })
         const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
 
-        acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, ccEmail: newUser.secondaryEmail});
+        // acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, ccEmail: newUser.secondaryEmail});
 
-        ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
-            adminMail(item, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber })
-        })
+        // ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
+        //     adminMail(item, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber })
+        // })
 
         adminMailWithPassword("ayush@westgateithub.com", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
 
@@ -601,6 +601,12 @@ export const updateACRUser = async (req: any, res: Response) => {
         user.appliedRole = appliedRole || user?.appliedRole;
         user.profile = profile || user?.profile;
         await user.save();
+
+        acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail});
+
+        ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
+            adminMail(item, { agencyName: user?.agencyName, name: user.personName, email: user.personEmail, phone: user?.phoneNumber })
+        })
 
         return res.status(200).json({
             message: "User updated successfully",
