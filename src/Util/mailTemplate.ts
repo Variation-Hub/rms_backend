@@ -181,7 +181,7 @@ export const acrPasswordGeneratedMailTemplate = (data: any) => {
                 <p>Thank you for registering with SaiVen's Agency Capacity Record (ACR) system. We’re excited to have you as part of our recruitment partner network!<p>
                 <p>Your registration has been successfully received, and our team will review your profile shortly. We will get back to you once the review is complete to confirm the next steps.</p>
                 <p>In the meantime, if you have any questions or need assistance, please don't hesitate to reach out to <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:#467886;">jamie.thompson@saivensolutions.co.uk</a>.</p>
-                <p>Thank you again for partnering with us, and we look forward to working together.</p>
+                <p>Thank you for your interest in partnering with us, we look forward to working with you!.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
                     SaiVen Technology Solutions</p>
@@ -341,7 +341,7 @@ export const cvReviewMailTemplate = (data: any) => {
 export const adminMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-                <p>Dear Admin</b></p>
+                <p>Dear Jamie</b></p>
                 <p>We would like to inform you that the following agency has successfully completed the ACR Registration:</p>
                 
                 <ul>
@@ -352,10 +352,12 @@ export const adminMailTemplate = (data: any) => {
                     
                 </ul>
                 
-                <p>Please review the details and take the necessary actions.<br/></p>
+                <p>Please evaluate the agency and get back to Ayush in case the ACR login details needs to be created for this Agency.<br/></p>
              
                 <div style="margin-top: 20px;">
                     <p>Thank you.</p>
+                    <p>Best Regards,</p>
+                    <p>SaiVen Technology Solutions</p>
                 </div>
             </div>
         </div>`
