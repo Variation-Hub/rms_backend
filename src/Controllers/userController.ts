@@ -204,19 +204,36 @@ export const deleteFiles = async (req: Request, res: Response) => {
 export const createACRUser = async (req: Request, res: Response) => {
     try {
         const { personEmail } = req.body
-        const user = await ACRUserModel.findOne({ personEmail })
+        const user: any = await ACRUserModel.findOne({ personEmail })
 
         if (user) {
-            return res.status(400).json({
-                message: "ACR User already exists",
-                status: false,
-                data: null
-            })
-        }
+            for (let key in req.body) {
+                user[key] = req.body[key];
+            }
+            await user.save();
+           const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName })
+            return res.status(200).json({
+                message: "ACR User update success",
+                status: true,
+                data: { token, user: user }
+            });
+            // return res.status(400).json({
+            //     message: "ACR User already exists",
+            //     status: false,
+            //     data: null
+            // })
+        } else {
 
-        const password = generatePassword();
-        const newUser = await ACRUserModel.create({ ...req.body, password })
-        const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
+            const password = generatePassword();
+            const newUser = await ACRUserModel.create({ ...req.body, password })
+            const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
+            adminMailWithPassword("ayush@westgateithub.com", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
+            return res.status(200).json({
+                message: "ACR User registration success",
+                status: true,
+                data: { token, user: newUser }
+            });
+        }
 
         // acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, ccEmail: newUser.secondaryEmail});
 
@@ -224,13 +241,7 @@ export const createACRUser = async (req: Request, res: Response) => {
         //     adminMail(item, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber })
         // })
 
-        adminMailWithPassword("ayush@westgateithub.com", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
 
-        return res.status(200).json({
-            message: "ACR User registration success",
-            status: true,
-            data: { token, user: newUser }
-        });
     } catch (err: any) {
         return res.status(500).json({
             message: err.message,
@@ -602,7 +613,7 @@ export const updateACRUser = async (req: any, res: Response) => {
         user.profile = profile || user?.profile;
         await user.save();
 
-        acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail});
+        acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail });
 
         ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
             adminMail(item, { agencyName: user?.agencyName, name: user.personName, email: user.personEmail, phone: user?.phoneNumber })
