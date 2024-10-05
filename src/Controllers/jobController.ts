@@ -155,6 +155,7 @@ export const getJobs = async (req: any, res: Response) => {
                 location: job.location,
                 day_rate: job.day_rate,
                 applicants: job.applicants,
+                upload: job.upload,
                 timerEnd: job.timerEnd,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: job.status === "Inactive" ? "Inactive" : jobTimeLeft > 0 ? 'Active' : 'Expired',
