@@ -71,7 +71,7 @@ export async function inviteLoginEmailSend(data: any) {
             from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
             subject: `Welcome to Saiven Technology Solutions - Access Your Candidate Portal`, // Subject line
-            text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk.\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body
+            text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body
             html: inviteLoginEmail(data), // html body
         });
 
