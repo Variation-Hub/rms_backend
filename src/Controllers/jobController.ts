@@ -46,7 +46,7 @@ export const createJob = async (req: Request, res: Response) => {
         if (status === 'Active') {
             allAgengies.forEach((agent: any) => {
                 if (agent.personEmail) {
-                    activeRolesPostedMail(agent.personEmail, { name: agent.agencyName })
+                    activeRolesPostedMail(agent.personEmail, { name: agent?.agencyName })
                 }
             });
             newJobAlertMail('ayush@westgateithub.com', {
