@@ -49,11 +49,11 @@ export const createJob = async (req: Request, res: Response) => {
             }
 
             allAgengies?.forEach(async (agent: any, index: number) => {
-                if (agent.personEmail) {
+                if (agent?.personEmail) {
                     await delay(index * 1000); // Adding 1-second delay per email
-                    const success = await activeRolesPostedMail(agent.personEmail, { name: agent?.agencyName });
+                    const success = await activeRolesPostedMail(agent?.personEmail, { name: agent?.agencyName });
                     if (!success) {
-                        console.log(`Failed to send email to ${agent.personEmail}`);
+                        console.log(`Failed to send email to ${agent?.personEmail}`);
                     }
                 }
             });
@@ -62,8 +62,8 @@ export const createJob = async (req: Request, res: Response) => {
                 numOfRoles: req.body?.no_of_roles,
                 publishedDate: req.body?.publish_date,
                 dayRate: req.body?.day_rate,
-                filename: newJob?.upload?.key,
-                url: newJob?.upload?.url
+                filename: newJob?.upload?.key || "",
+                url: newJob?.upload?.url || ""
             })
         }
         return res.status(200).json({
