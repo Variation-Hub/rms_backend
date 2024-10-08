@@ -327,7 +327,6 @@ export const cvReviewMailTemplate = (data: any) => {
                 </ul>
                 
                 <p>The vetting process will now be initiated by our Management Consultant (MC) team. Please ensure all necessary steps are followed.</p>
-                <p>If you have any questions or need assistance, please feel free to contact us. <br/></p>
              
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
