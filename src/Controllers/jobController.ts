@@ -44,9 +44,17 @@ export const createJob = async (req: Request, res: Response) => {
         const allAgengies: any = await ACRUserModel.find();
 
         if (status === 'Active') {
-            allAgengies.forEach((agent: any) => {
+            function delay(ms: number) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            allAgengies?.forEach(async (agent: any, index: number) => {
                 if (agent.personEmail) {
-                    activeRolesPostedMail(agent.personEmail, { name: agent?.agencyName })
+                    await delay(index * 1000); // Adding 1-second delay per email
+                    const success = await activeRolesPostedMail(agent.personEmail, { name: agent?.agencyName });
+                    if (!success) {
+                        console.log(`Failed to send email to ${agent.personEmail}`);
+                    }
                 }
             });
             newJobAlertMail('ayush@westgateithub.com', {
