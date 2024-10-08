@@ -268,7 +268,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 <p> <b>Upload CV(s) Here:</b>
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
-                <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not respond within the given timeframe, your application to supply candidates for these roles will be impacted.</p>
+                <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not upload within the given timeframe, your agreement to supply candidates could be revoked.</p>
                 <p><strong>Steps to Upload CV:</strong></p>
                 <ol>
                     <li>Log in to the System.</li>
