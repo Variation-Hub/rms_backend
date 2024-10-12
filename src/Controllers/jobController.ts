@@ -197,17 +197,67 @@ export const getJobById = async (req: any, res: Response) => {
         const userId = req.user._id;
         const jobId = req.params.id;
 
-        // Find the job by job_id
-        const job: any = await Job.findOne({ job_id: jobId }).lean();
+        const job: any = await Job.aggregate([
+            {
+                $match: {
+                    job_id: jobId
+                }
+            },
+            {
+                $lookup: {
+                    from: 'jobapplications',
+                    localField: 'applicants',
+                    foreignField: '_id',
+                    as: 'applicantsInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'acrusers',
+                    localField: 'applicantsInfo.user_id', // Match applicantsInfo user_id with clientInfo _id
+                    foreignField: '_id',
+                    as: 'applicantsInfo.clientInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo.clientInfo',
+                    preserveNullAndEmptyArrays: true // Optional: if there are no matching clients, still keep applicantsInfo
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id', // Group back into one job document
+                    job_id: { $first: '$job_id' },
+                    job_title: { $first: '$job_title' },
+                    no_of_roles: { $first: '$no_of_roles' },
+                    start_date: { $first: '$start_date' },
+                    publish_date: { $first: '$publish_date' },
+                    client_name: { $first: '$client_name' },
+                    location: { $first: '$location' },
+                    day_rate: { $first: '$day_rate' },
+                    status: { $first: '$status' },
+                    upload: { $first: '$upload' },
+                    timerEnd: { $first: '$timerEnd' },
+                    applicantsInfo: { $push: '$applicantsInfo' } // Group all applicantsInfo with clientInfo embedded
+                }
+            }
+        ]);
+        
+        
+
         if (!job) return res.status(404).json({ message: "Job not found" });
 
         const now = new Date();
         const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
-        // Perform a lookup for applicants' information from the JobApplication collection
         const applicantsInfo = await Application.find({ _id: { $in: job.applicants } });
 
-        // Filter for the matching applicant based on the user ID
         const matchingApplicant = applicantsInfo.find((applicant: any) => applicant.user_id.toString() === userId.toString());
 
         let processedApplicantInfo: any = {};
@@ -233,7 +283,7 @@ export const getJobById = async (req: any, res: Response) => {
         return res.status(200).json({
             message: "Job retrieved successfully",
             status: true,
-            data: jobWithTimeLeft
+            data: job
         });
     } catch (error: any) {
         return res.status(500).json({

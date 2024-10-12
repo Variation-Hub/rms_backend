@@ -18,6 +18,7 @@ import {
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
+import { paginationMiddleware } from '../Middleware/pagination';
 
 const userRoutes = express.Router();
 
@@ -34,7 +35,7 @@ userRoutes.post("/acr/register", createACRUser);
 userRoutes.post("/acr/login", loginACRUser);
 userRoutes.patch("/acr/update", authorizeRoles(), updateACRUser);
 userRoutes.post("/acr/reset", authorizeRoles(), resetacrPassword)
-userRoutes.get("/acr/list", authorizeRoles(), getACRUsers)
+userRoutes.get("/acr/list", paginationMiddleware, authorizeRoles(), getACRUsers)
 userRoutes.post("/acr/forgot", forgotACRUserPassword)
 
 //Admin routes

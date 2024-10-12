@@ -211,7 +211,7 @@ export const createACRUser = async (req: Request, res: Response) => {
                 user[key] = req.body[key];
             }
             await user.save();
-           const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName })
+            const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName })
             return res.status(200).json({
                 message: "ACR User update success",
                 status: true,
@@ -289,12 +289,25 @@ export const loginACRUser = async (req: Request, res: Response) => {
 
 export const getACRUsers = async (req: Request, res: Response) => {
     try {
-        const users = await ACRUserModel.find();
+
+        const { page, limit, skip } = req.pagination!;
+
+        const totalCount = await ACRUserModel.countDocuments();
+
+        const users = await ACRUserModel.find()
+            .skip(skip)
+            .limit(limit);
 
         return res.status(200).json({
             message: "ACR Users fetch successfully",
             status: true,
-            data: users
+            data: users,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / (limit as number))
+            }
         });
     } catch (err: any) {
         return res.status(500).json({
