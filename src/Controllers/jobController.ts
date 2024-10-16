@@ -57,14 +57,26 @@ export const createJob = async (req: Request, res: Response) => {
                     }
                 }
             });
-            newJobAlertMail('ayush@westgateithub.com', {
-                jobTitle: req.body?.job_title,
-                numOfRoles: req.body?.no_of_roles,
-                publishedDate: req.body?.publish_date,
-                dayRate: req.body?.day_rate,
-                filename: newJob?.upload?.key || "",
-                url: newJob?.upload?.url || ""
-            })
+
+            ["jamie.thompson@saivensolutions.co.uk",
+                "admin@saivensolutions.co.uk",
+                "info@saivensolitions.co.uk",
+                "gopalkrishna.sp@saivensolutions.co.uk",
+                "arif@saivensolutions.co.uk"]?.forEach(async (email, index) => {
+                    await delay(index * 1000); // Adding 1-second delay per email
+                    const success = await newJobAlertMail(email, {
+                        jobTitle: req.body?.job_title,
+                        numOfRoles: req.body?.no_of_roles,
+                        publishedDate: req.body?.publish_date,
+                        dayRate: req.body?.day_rate,
+                        filename: newJob?.upload?.key || "",
+                        url: newJob?.upload?.url || ""
+                    })
+                    if (!success) {
+                        console.log(`Failed to send email to ${email}`);
+                    }
+                });
+
         }
         return res.status(200).json({
             message: "Job created successfully",
@@ -248,8 +260,8 @@ export const getJobById = async (req: any, res: Response) => {
                 }
             }
         ]);
-        
-        
+
+
 
         if (!job) return res.status(404).json({ message: "Job not found" });
 
@@ -272,13 +284,6 @@ export const getJobById = async (req: any, res: Response) => {
                 cv_time_left: cvTimeLeft
             };
         }
-
-        const jobWithTimeLeft = {
-            ...job,
-            job_time_left: job.status === "Inactive" ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
-            status: job.status === "Inactive" ? "Inactive" : jobTimeLeft > 0 ? 'Active' : 'Expired',
-            ...processedApplicantInfo
-        };
 
         return res.status(200).json({
             message: "Job retrieved successfully",
@@ -459,8 +464,11 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
                 cv_count: application?.cvDetails.length,
                 uploadeBy: user?.agencyName,
                 date: formattedDate,
+                nationality: application?.cvDetails?.map((item: any) => item?.candidate_nationality)?.join(', '),
+                location: application?.cvDetails?.map((item: any) => item?.candidate_location)?.join(', '),
                 filename: job?.upload?.key,
-                url: job?.upload?.url
+                url: job?.upload?.url,
+                cvUploaded: application?.cvDetails?.map((item: any) => item?.cv)
             })
         }
 

@@ -34,7 +34,7 @@ export async function forgotEmailSend(data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
-            subject: "Reset Your Password for Saiven Technology Solutions Account", // Subject line
+            subject: "Reset Your Password for SaiVen Technology Solutions Limited Account", // Subject line
             text: `reset link ${data.link}`, // plain text body
             html: generateEmailTemplateForgotPassword(data), // html body
         });
@@ -52,8 +52,8 @@ export async function referViaCodeEmailSend(data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
-            subject: `Invitation to Join Saiven Technology Solutions - Complete Your Registration`, // Subject line
-            text: `Dear ${data.newCandidateName},\n\nYou have been referred by ${data.name} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.\n\nTo get started, please complete your registration by clicking the link below: ${data.link}\n\nOnce registered, you will gain access to opportunities in UK Public Sector Contracts and be a part of a community of professionals just like you.\n\nImportant: Please use the Referral Code – ${data.referralCode} while completing your registration.\n\nWe look forward to welcoming you!\n\nBest regards,\nHR Team\nSaiven Technology Solutions`, // plain text body
+            subject: `Invitation to Join SaiVen Technology Solutions Limited - Complete Your Registration`, // Subject line
+            text: `Dear ${data.newCandidateName},\n\nYou have been referred by ${data.name} to join SaiVen Technology Solutions Limited! We are excited to invite you to be part of our professional network.\n\nTo get started, please complete your registration by clicking the link below: ${data.link}\n\nOnce registered, you will gain access to opportunities in UK Public Sector Contracts and be a part of a community of professionals just like you.\n\nImportant: Please use the Referral Code – ${data.referralCode} while completing your registration.\n\nWe look forward to welcoming you!\n\nBest regards,\nHR Team\nSaiVen Technology Solutions Limited`, // plain text body
             html: referViaCode(data), // html body
         });
 
@@ -70,8 +70,8 @@ export async function inviteLoginEmailSend(data: any) {
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: data.email, // list of receivers
-            subject: `Welcome to Saiven Technology Solutions - Access Your Candidate Portal`, // Subject line
-            text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiven Technology Solutions`, // plain text body
+            subject: `Welcome to SaiVen Technology Solutions Limited - Access Your Candidate Portal`, // Subject line
+            text: `Dear ${data.candidateName},\n\nThank you for registering with Us! We are excited to have you join our network of professionals.\n\nTo get started, please log in to your candidate portal: ${data.link}\n\nIf you have any questions, please feel free to reach out to me at jamie.thompson@saivensolutions.co.uk\n\nBest regards,\nJamie Thompson\nRecruitment Lead\nSaiVen Technology Solutions Limited`, // plain text body
             html: inviteLoginEmail(data), // html body
         });
 
@@ -215,10 +215,14 @@ export async function cvRecivedMail(reciverEmail: string, data: any) {
 export async function cvReviewMail(reciverEmail: string, data: any) {
 
     try {
+        const attachments = data.cvUploaded.map((attachment: any) => ({
+            filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+            path: attachment.url, // Path to the file
+        }))
         await transporter.sendMail({
             from: 'info@saivensolutions.co.uk', // sender address
             to: reciverEmail, // list of receivers
-            subject: "CVs Uploaded – Vetting Process Initiation", // Subject line
+            subject: "CVs Uploaded - Vetting Process Initiation", // Subject line
             text: ``, // plain text body
             html: cvReviewMailTemplate(data), // html body
             attachments: [
@@ -226,6 +230,7 @@ export async function cvReviewMail(reciverEmail: string, data: any) {
                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
                     path: data?.url, // Path to the file
                 },
+                ...attachments
             ],
         });
 

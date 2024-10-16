@@ -105,7 +105,7 @@ export const generateEmailTemplateForgotPassword = (data: any) => {
             <br/>
             <p>Best regards,</p>
             <p><strong>Tech Team</strong><br/>
-               Saiven Technology Solutions
+               SaiVen Technology Solutions Limited
             </p>
         </div>
     `;
@@ -115,7 +115,7 @@ export const referViaCode = (data: any) => {
     return `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <p>Dear ${data.newCandidateName},</p>
-            <p>You have been referred by ${data.name}  for your professional expertise as a ${data.currentWork} to join Saiven Technology Solutions! We are excited to invite you to be part of our professional network.</p>
+            <p>You have been referred by ${data.name}  for your professional expertise as a ${data.currentWork} to join SaiVen Technology Solutions Limited! We are excited to invite you to be part of our professional network.</p>
             <p>To get started, please complete your registration by clicking the link below:</p>
             <p style="text-align: center;">
                 <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Complete Your Registration</a>
@@ -126,7 +126,7 @@ export const referViaCode = (data: any) => {
             <br/>
             <p>Best regards,</p>
             <p><strong>HR Team</strong><br/>
-               Saiven Technology Solutions
+               SaiVen Technology Solutions Limited
             </p>
         </div>
     `;
@@ -148,7 +148,7 @@ export const inviteLoginEmail = (data: any) => {
             <p>Best regards,</p>
             <p><strong>Jamie Thompson</strong><br/>
                Recruitment Lead<br/>
-               Saiven Technology Solutions
+               SaiVen Technology Solutions Limited
             </p>
         </div>
     `;
@@ -184,7 +184,7 @@ export const acrPasswordGeneratedMailTemplate = (data: any) => {
                 <p>Thank you for your interest in partnering with us, we look forward to working with you!.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    SaiVen Technology Solutions</p>
+                    SaiVen Technology Solutions Limited</p>
                 </div>
             </div>
         </div>`
@@ -215,7 +215,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    SaiVen Technology Solutions</p>
+                    SaiVen Technology Solutions Limited</p>
                 </div>
             </div>
         </div>`
@@ -281,7 +281,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 <p>Thank you for your immediate attention.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    SaiVen Technology Solutions</p>
+                    SaiVen Technology Solutions Limited</p>
                 </div>
             </div>
         </div>`
@@ -305,7 +305,7 @@ export const cvRecivedMailTemplate = (data: any) => {
                 <p>If you have more CVs to submit , please attach and send them to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
-                    SaiVen Technology Solutions</p>
+                    SaiVen Technology Solutions Limited</p>
                 </div>
             </div>
         </div>`
@@ -323,14 +323,16 @@ export const cvReviewMailTemplate = (data: any) => {
                     <li><b>No. of CVs Uploaded:</b> ${data.cv_count}</li>
                     <li><b>Uploaded by:</b> ${data.uploadeBy}</li>
                     <li><b>Upload Date:</b> ${data.date}</li>
+                    <li><b>Candidate Nationality:</b> ${data.nationality}</li>
+                    <li><b>Candidate Location:</b> ${data.location}</li>
                     
                 </ul>
                 
                 <p>The vetting process will now be initiated by our Management Consultant (MC) team. Please ensure all necessary steps are followed.</p>
              
                 <div style="margin-top: 20px;">
-                    <p>Best regards,<br>
-                    ACR Portal
+                    <p>Best regards,<br/>
+                    SaiVen Technology Solutions Limited Limited
                     </p>
                 </div>
             </div>
@@ -356,7 +358,7 @@ export const adminMailTemplate = (data: any) => {
                 <div style="margin-top: 20px;">
                     <p>Thank you.</p>
                     <p>Best Regards,</p>
-                    <p>SaiVen Technology Solutions</p>
+                    <p>SaiVen Technology Solutions Limited</p>
                 </div>
             </div>
         </div>`
