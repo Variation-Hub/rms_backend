@@ -14,7 +14,7 @@ const JobSchema = new mongoose.Schema({
         trim: true,
     },
     no_of_roles: {
-        type: Number,
+        type: String,
         required: true,
     },
     start_date: {
