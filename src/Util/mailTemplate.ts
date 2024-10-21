@@ -387,3 +387,23 @@ export const adminMailWithPhoneTemplate = (data: any) => {
             </div>
         </div>`
 }
+
+export const InActiveRolesPostedMailTemplate = (data: any) => {
+
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p><b>Dear Team,</b></p>
+                <p>Please be informed that the following inactive job has been posted in the ACR system:</p>
+                <ul>
+                    <li>Job Title: ${data?.jobTitle}</li>
+                    <li>Position Start Date: ${data?.start_date} </li>
+                    <li>Client Name: ${data?.client_name}</li>
+                </ul>
+                <p>If there are any actions required from your end, please proceed accordingly.</p>
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br>
+                    SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}

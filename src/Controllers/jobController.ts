@@ -3,7 +3,7 @@ import Job from '../Models/JobModel';
 import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
 import ACRUserModel from '../Models/ACRUserModel';
-import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
+import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
 
 const emailSend = 'ayushsinghraj3535@gmail.com';
 
@@ -77,6 +77,12 @@ export const createJob = async (req: Request, res: Response) => {
                     }
                 });
 
+        } else {
+            await InActiveRolesPostedMail("jamie.thompson@saivensolutions.co.uk", {
+                jobTitle: req?.body?.job_title || "",
+                start_date: req?.body?.start_date || "",
+                client_name: req?.body?.client_name || ""
+            })
         }
         return res.status(200).json({
             message: "Job created successfully",

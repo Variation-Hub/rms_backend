@@ -1,5 +1,5 @@
 import path from "path";
-import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvReviewMailTemplate, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, inviteLoginEmail, newJobAlertMailTemplate, referViaCode, uploadCVAlertMailTemplate } from "./mailTemplate";
+import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvReviewMailTemplate, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, referViaCode, uploadCVAlertMailTemplate } from "./mailTemplate";
 
 const nodemailer = require('nodemailer');
 
@@ -269,6 +269,25 @@ export async function adminMailWithPassword(reciverEmail: string, data: any) {
             subject: "New User Registering with SaiVen ACR System", // Subject line
             text: ``, // plain text body
             html: adminMailWithPhoneTemplate(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+export async function InActiveRolesPostedMail(reciverEmail: string, data: any) {
+
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "Notification: Inactive Job Posted in ACR System", // Subject line
+            text: ``, // plain text body
+            html: InActiveRolesPostedMailTemplate(data), // html body
         });
 
         return true;
