@@ -109,7 +109,7 @@ ACRUserModel.pre('save', async function (this: any, next) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(this.password, salt);
 
-        this.email = this.email?.toLowerCase();
+        this.personEmail = this.personEmail?.toLowerCase();
         this.password = hashedPassword;
         next();
     } catch (error: any) {
