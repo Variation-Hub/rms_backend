@@ -50,6 +50,11 @@ const JobSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'JobApplication',
     }],
+    candicateApplication:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CandidateApplication',
+        required: true
+    }],
     upload: {
         type: mongoose.Schema.Types.Mixed,
         default: {

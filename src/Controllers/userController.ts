@@ -9,7 +9,10 @@ import mongoose from "mongoose"
 import { acrPasswordGeneratedMail, adminMail, adminMailWithPassword, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
+import CandidateJobApplication from '../Models/candicateJobApplication'
 import { generatePassword } from "../Util/passwordGenarator"
+import JobModel from "../Models/JobModel"
+import candicateJobApplication from "../Models/candicateJobApplication"
 const { Parser } = require('json2csv');
 
 const url = 'https://rms.saivensolutions.co.uk';
@@ -199,8 +202,149 @@ export const deleteFiles = async (req: Request, res: Response) => {
     }
 }
 
+// JOB APPLICATION
+export const applyJobRole = async (req: any, res: Response) => {
+    try {
+        const user_id = req.user?._id;
+        const { job_id } = req.params
+        const { cv } = req.body
+
+        const applied = await CandidateJobApplication.findOne({
+            job_id,
+            user_id
+        })
+
+        if (applied) {
+            return res.status(400).json({
+                message: "You have already applied for this job",
+                status: false,
+                data: null
+            });
+        }
+
+        const job = await JobModel.findOne({ job_id });
+
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found",
+                status: false,
+                data: null
+            });
+        }
+
+        const user = await userModel.findById(user_id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+                data: null
+            });
+        }
+
+        if (cv) {
+            user.cv = cv;
+            await user.save();
+        }
 
 
+        const jobApplication = await CandidateJobApplication.create({
+            user_id,
+            job_id,
+            cvDetails: user.cv
+        });
+
+        console.log(job?.job_id, user?._id, jobApplication?._id)
+
+        job.candicateApplication.push(jobApplication?._id);
+
+        await job.save();
+
+        return res.json({
+            message: "Applied for the job successfully",
+            status: true,
+            data: jobApplication
+        });
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const fetchJobs = async (req: any, res: Response) => {
+    try {
+        const { page, limit, skip } = req.pagination!;
+        const { keyword } = req.query
+        const user_id = req.user?._id;
+
+        let query: any = { status: 'Active' }
+        if (keyword) {
+            query.job_title = { $regex: keyword, $options: 'i' };
+        }
+
+        let totalCount = await JobModel.find(query).countDocuments();
+
+        const jobs = await JobModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $lookup: {
+                    from: "candidatejobapplications",
+                    localField: "candicateApplication",
+                    foreignField: "_id",
+                    as: "candidateApplications"
+                },
+            }
+        ]).skip(skip).limit(limit);
+
+        let jobsWithProcessedData = jobs.map((job: any) => {
+
+            const matchingApplicant = job.candidateApplications.find((applicant: any) => applicant.user_id.toString() === user_id.toString());
+
+            if (matchingApplicant) {
+                job.status = "Applied"
+            }
+
+            return {
+                _id: job._id,
+                job_id: job.job_id,
+                job_title: job.job_title,
+                no_of_roles: job.no_of_roles,
+                publish_date: job.publish_date,
+                upload: job.upload,
+                status: job.status,
+                // candidateDetails: matchingApplicant
+            };
+        });
+
+        return res.json({
+            message: "Fetched jobs successfully",
+            status: true,
+            data: jobsWithProcessedData,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / limit)
+            }
+        });
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+
+
+// ACR
 export const createACRUser = async (req: Request, res: Response) => {
     try {
         const { personEmail } = req.body

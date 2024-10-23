@@ -102,7 +102,7 @@ export const createJob = async (req: Request, res: Response) => {
 export const getJobs = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
-        const { keyword } = req.query
+        const { keyword, status } = req.query
         const userId = req.user._id;
 
         let query: any = {}
@@ -110,7 +110,7 @@ export const getJobs = async (req: any, res: Response) => {
             query.job_title = { $regex: keyword, $options: 'i' };
         }
 
-        const totalCount = await Job.find(query).countDocuments();
+        let totalCount = await Job.find(query).countDocuments();
 
         const data = await Job.aggregate([
             {
@@ -156,9 +156,8 @@ export const getJobs = async (req: any, res: Response) => {
             }
         ]).skip(skip).limit(limit);
 
-
         // Process the aggregated results
-        const jobsWithProcessedData = data.map((job: any) => {
+        let jobsWithProcessedData = data.map((job: any) => {
             const now = new Date();
             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
@@ -197,6 +196,11 @@ export const getJobs = async (req: any, res: Response) => {
                 ...processedApplicantInfo // Include the applicant info only if the user ID matches
             };
         });
+
+        if (status) {
+            jobsWithProcessedData = jobsWithProcessedData.filter(item => item.status === status)
+            totalCount = jobsWithProcessedData.length;
+        }
 
         return res.status(200).json({
             message: "Jobs retrieved successfully",
