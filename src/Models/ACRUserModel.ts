@@ -126,7 +126,7 @@ ACRUserModel.pre('findOneAndUpdate', async function (this: any, next) {
             const hashedPassword = await bcrypt.hash(update.password, salt);
             this.setUpdate({ ...update, password: hashedPassword });
 
-            this.email = this.email?.toLowerCase();
+            this.personEmail = this.email?.toLowerCase();
 
             next();
         } catch (error: any) {
