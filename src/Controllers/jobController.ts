@@ -102,11 +102,20 @@ export const createJob = async (req: Request, res: Response) => {
 export const getJobs = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
+        const { keyword } = req.query
         const userId = req.user._id;
 
-        const totalCount = await Job.find().countDocuments();
+        let query: any = {}
+        if (keyword) {
+            query.job_title = { $regex: keyword, $options: 'i' };
+        }
+
+        const totalCount = await Job.find(query).countDocuments();
 
         const data = await Job.aggregate([
+            {
+                $match: query,
+            },
             {
                 $lookup: {
                     from: 'jobapplications', // The JobApplication collection
