@@ -5,7 +5,7 @@ import Counter from '../Models/JobCounter'
 import ACRUserModel from '../Models/ACRUserModel';
 import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
 
-const emailSend = 'ayushsinghraj3535@gmail.com';
+const emailSend = process.env.JOB_MAIL!;
 
 export const fetchJobId = async (req: Request, res: Response) => {
     try {
@@ -58,27 +58,23 @@ export const createJob = async (req: Request, res: Response) => {
                 }
             });
 
-            ["jamie.thompson@saivensolutions.co.uk",
-                "admin@saivensolutions.co.uk",
-                "info@saivensolitions.co.uk",
-                "gopalkrishna.sp@saivensolutions.co.uk",
-                "arif@saivensolutions.co.uk"]?.forEach(async (email, index) => {
-                    await delay(index * 1000); // Adding 1-second delay per email
-                    const success = await newJobAlertMail(email, {
-                        jobTitle: req.body?.job_title,
-                        numOfRoles: req.body?.no_of_roles,
-                        publishedDate: req.body?.publish_date,
-                        dayRate: req.body?.day_rate,
-                        filename: newJob?.upload?.key || "",
-                        url: newJob?.upload?.url || ""
-                    })
-                    if (!success) {
-                        console.log(`Failed to send email to ${email}`);
-                    }
-                });
+            process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
+                await delay(index * 1000); // Adding 1-second delay per email
+                const success = await newJobAlertMail(email, {
+                    jobTitle: req.body?.job_title,
+                    numOfRoles: req.body?.no_of_roles,
+                    publishedDate: req.body?.publish_date,
+                    dayRate: req.body?.day_rate,
+                    filename: newJob?.upload?.key || "",
+                    url: newJob?.upload?.url || ""
+                })
+                if (!success) {
+                    console.log(`Failed to send email to ${email}`);
+                }
+            });
 
         } else {
-            await InActiveRolesPostedMail("jamie.thompson@saivensolutions.co.uk", {
+            await InActiveRolesPostedMail(process.env.EMAIL_INACTIVE!, {
                 jobTitle: req?.body?.job_title || "",
                 start_date: req?.body?.start_date || "",
                 client_name: req?.body?.client_name || ""

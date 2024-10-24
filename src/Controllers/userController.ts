@@ -12,7 +12,6 @@ import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
 import { generatePassword } from "../Util/passwordGenarator"
 import JobModel from "../Models/JobModel"
-import candicateJobApplication from "../Models/candicateJobApplication"
 const { Parser } = require('json2csv');
 
 const url = 'https://rms.saivensolutions.co.uk';
@@ -371,20 +370,13 @@ export const createACRUser = async (req: Request, res: Response) => {
             const password = generatePassword();
             const newUser = await ACRUserModel.create({ ...req.body, password })
             const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
-            adminMailWithPassword("", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
+            adminMailWithPassword(process.env.EMAIL_PASSWORD!, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
             return res.status(200).json({
                 message: "ACR User registration success",
                 status: true,
                 data: { token, user: newUser }
             });
         }
-
-        // acrPasswordGeneratedMail(newUser.personEmail, { name: newUser.personName, ccEmail: newUser.secondaryEmail});
-
-        // ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
-        //     adminMail(item, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber })
-        // })
-
 
     } catch (err: any) {
         return res.status(500).json({
