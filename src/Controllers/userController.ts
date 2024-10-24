@@ -427,10 +427,23 @@ export const getACRUsers = async (req: Request, res: Response) => {
     try {
 
         const { page, limit, skip } = req.pagination!;
+        const { keyword } = req.query!;
 
-        const totalCount = await ACRUserModel.countDocuments();
+        const query: any = {};
 
-        const users = await ACRUserModel.find()
+        if (keyword) {
+            query.$or = [
+                { personName: { $regex: keyword, $options: 'i' } },
+                { personEmail: { $regex: keyword, $options: 'i' } },
+                { agencyName: { $regex: keyword, $options: 'i' } },
+                { secondaryContectName: { $regex: keyword, $options: 'i' } },
+                { secondaryEmail: { $regex: keyword, $options: 'i' } }
+            ];
+        }
+
+        const totalCount = await ACRUserModel.countDocuments(query);
+
+        const users = await ACRUserModel.find(query)
             .skip(skip)
             .limit(limit);
 
