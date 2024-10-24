@@ -8,6 +8,8 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "start:dev": "copy .env.dev .env && nodemon src/index.ts",
+    "start:live": "copy .env.prod .env && nodemon src/index.ts",
     "dep": "NODE_OPTIONS=--max-old-space-size=4096 nodemon --exec ts-node src/index.ts"
   },
   "keywords": [],

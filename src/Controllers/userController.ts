@@ -371,7 +371,7 @@ export const createACRUser = async (req: Request, res: Response) => {
             const password = generatePassword();
             const newUser = await ACRUserModel.create({ ...req.body, password })
             const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
-            adminMailWithPassword("ayush@westgateithub.com", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
+            adminMailWithPassword("", { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
             return res.status(200).json({
                 message: "ACR User registration success",
                 status: true,
@@ -772,7 +772,7 @@ export const updateACRUser = async (req: any, res: Response) => {
 
         acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail });
 
-        ["admin@saivensolutions.co.uk", "jamie.thompson@saivensolutions.co.uk", "info@saivensolutions.co.uk"]?.forEach((item: string) => {
+        process.env.EMAIL_ARRAY?.split(" ")?.forEach((item: string) => {
             adminMail(item, { agencyName: user?.agencyName, name: user.personName, email: user.personEmail, phone: user?.phoneNumber })
         })
 
