@@ -98,72 +98,93 @@ export const createJob = async (req: Request, res: Response) => {
 export const getJobs = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
-        const { keyword, status } = req.query
+        const { keyword, status } = req.query;
         const userId = req.user._id;
 
-        let query: any = {}
+        let query: any = {};
         if (keyword) {
             query.job_title = { $regex: keyword, $options: 'i' };
         }
 
-        let totalCount = await Job.find(query).countDocuments();
-
-        const data = await Job.aggregate([
-            {
-                $match: query,
-            },
+        // Common aggregation pipeline with computed fields
+        const aggregationPipeline:any = [
+            { $match: query },
             {
                 $lookup: {
-                    from: 'jobapplications', // The JobApplication collection
-                    localField: 'applicants', // Job applicants' IDs
-                    foreignField: '_id', // The field in JobApplication that corresponds to those IDs
-                    as: 'applicantsInfo' // Store the looked-up documents
+                    from: 'jobapplications',
+                    localField: 'applicants',
+                    foreignField: '_id',
+                    as: 'applicantsInfo'
                 }
             },
             {
                 $addFields: {
-                    sortStatus: {
-                        $cond: {
-                            if: { $eq: ["$status", "Active"] },
-                            then: 0,
-                            else: 1
-                        }
+                    jobTimeLeft: {
+                        $subtract: [new Date(), "$timerEnd"]
                     },
-                    sortInactiveStatus: {
-                        $cond: {
-                            if: { $eq: ["$status", "Inactive"] },
-                            then: 0,
-                            else: 1
-                        }
+                    dynamicStatus: {
+                        $cond: [
+                            { $lt: [new Date(), "$timerEnd"] },
+                            "Active",
+                            "Expired"
+                        ]
                     }
-                },
-            },
-            {
-                $sort: {
-                    sortStatus: 1, // Active (0) first, then Inactive (1)
-                    sortInactiveStatus: -1,
-                    createAt: -1 // Latest first
                 }
             },
             {
-                $project: {
-                    sortStatus: 0 // Optionally remove the sortStatus field
+                $addFields: {
+                    dynamicStatus: {
+                        $cond: [
+                            { $eq: ["$status", "Inactive"] },
+                            "Inactive",
+                            "$dynamicStatus"
+                        ]
+                    }
                 }
-            }
-        ]).skip(skip).limit(limit);
+            },
+            ...(status ? [{ $match: { dynamicStatus: status } }] : []), // Apply filter based on dynamicStatus if status is provided
+            {
+                $addFields: {
+                    sortStatus: {
+                        $cond: [
+                            { $eq: ["$dynamicStatus", "Active"] },
+                            0,
+                            {
+                                $cond: [
+                                    { $eq: ["$dynamicStatus", "Inactive"] },
+                                    2,
+                                    1
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            { $sort: { sortStatus: 1, createAt: -1 } },
+            { $project: { sortStatus: 0 } }
+        ];
 
-        // Process the aggregated results
-        let jobsWithProcessedData = data.map((job: any) => {
+        // Calculate total count after status filter
+        const totalCountData = await Job.aggregate(aggregationPipeline);
+        let totalCount = totalCountData.length;
+
+        // Apply pagination
+        const paginatedData = await Job.aggregate([
+            ...aggregationPipeline,
+            { $skip: skip },
+            { $limit: limit }
+        ]);
+
+        // Process the aggregated results with user-specific calculations
+        let jobsWithProcessedData = paginatedData.map((job: any) => {
             const now = new Date();
             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
-            // Filter applicants to check if the user ID matches
             const matchingApplicant = job.applicantsInfo.find((applicant: any) => applicant.user_id.toString() === userId.toString());
 
             let processedApplicantInfo: any = {};
             if (matchingApplicant) {
                 const cvTimeLeft = Math.max(new Date(matchingApplicant.timer).getTime() - now.getTime(), 0);
-
                 processedApplicantInfo = {
                     status: matchingApplicant.status,
                     no_of_resouces: matchingApplicant.no_of_resouces,
@@ -188,15 +209,10 @@ export const getJobs = async (req: any, res: Response) => {
                 upload: job.upload,
                 timerEnd: job.timerEnd,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
-                status: job.status === "Inactive" ? "Inactive" : jobTimeLeft > 0 ? 'Active' : 'Expired',
-                ...processedApplicantInfo // Include the applicant info only if the user ID matches
+                status: job.dynamicStatus,
+                ...processedApplicantInfo
             };
         });
-
-        if (status) {
-            jobsWithProcessedData = jobsWithProcessedData.filter(item => item.status === status)
-            totalCount = jobsWithProcessedData.length;
-        }
 
         return res.status(200).json({
             message: "Jobs retrieved successfully",
@@ -217,6 +233,8 @@ export const getJobs = async (req: any, res: Response) => {
         });
     }
 };
+
+
 
 // Get a job by ID
 export const getJobById = async (req: any, res: Response) => {
@@ -341,7 +359,7 @@ export const updateJob = async (req: Request, res: Response) => {
 // Delete a job
 export const deleteJob = async (req: Request, res: Response) => {
     try {
-        const job = await Job.findOneAndDelete({ job_id: req.params.id });
+        const job = await Job.findByIdAndDelete(req.params.id);
         if (!job) return res.status(404).json({ message: "Job not found" });
         return res.status(200).json({
             message: "Job deleted successfully",
