@@ -15,8 +15,7 @@ import {
     createAdmin,
     loginAdmin,
     forgotACRUserPassword,
-    applyJobRole,
-    fetchJobs
+    applyJobRole
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -32,7 +31,6 @@ userRoutes.post("/forgot", forgotUserPassword)
 userRoutes.post("/reset", resetPassword)
 userRoutes.post("/refer", authorizeRoles(), referUser)
 userRoutes.post("/apply-job/:job_id", authorizeRoles(), applyJobRole)
-userRoutes.get("/jobs", authorizeRoles(), paginationMiddleware, fetchJobs)
 
 //ACR user routes
 userRoutes.post("/acr/register", createACRUser);

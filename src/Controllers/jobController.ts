@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import Job from '../Models/JobModel';
+import JobCIR from '../Models/JobModelCIR';
 import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
+import CounterCIR from '../Models/JobCountCIR'
 import ACRUserModel from '../Models/ACRUserModel';
 import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
+import JobModelCIR from '../Models/JobModelCIR';
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -26,6 +29,27 @@ export const fetchJobId = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const fetchJobIdCIR = async (req: Request, res: Response) => {
+    try {
+        const counter: any = await CounterCIR.findOne();
+        const job_id = `JD${String(counter?.seq + 1).padStart(3, '0')}`;
+        return res.status(200).json({
+            message: "JobID Fetched",
+            status: true,
+            data: {
+                job_id
+            }
+        })
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
 // Create a new job
 export const createJob = async (req: Request, res: Response) => {
     try {
@@ -94,6 +118,75 @@ export const createJob = async (req: Request, res: Response) => {
     }
 };
 
+// Create a new job for CIR
+export const createJobCIR = async (req: Request, res: Response) => {
+    try {
+        const status = req?.body?.status;
+
+        if (status === 'Active') {
+            await CounterCIR.findOneAndUpdate(
+                {},
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true }
+            );
+        }
+
+        const newJob = await JobCIR.create({ ...req.body });
+
+        // const allAgengies: any = await ACRUserModel.find();
+
+        // if (status === 'Active') {
+        //     function delay(ms: number) {
+        //         return new Promise(resolve => setTimeout(resolve, ms));
+        //     }
+
+        //     allAgengies?.forEach(async (agent: any, index: number) => {
+        //         if (agent?.personEmail) {
+        //             await delay(index * 1000); // Adding 1-second delay per email
+        //             const success = await activeRolesPostedMail(agent?.personEmail, { name: agent?.agencyName });
+        //             if (!success) {
+        //                 console.log(`Failed to send email to ${agent?.personEmail}`);
+        //             }
+        //         }
+        //     });
+
+        //     process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
+        //         await delay(index * 1000); // Adding 1-second delay per email
+        //         const success = await newJobAlertMail(email, {
+        //             jobTitle: req.body?.job_title,
+        //             numOfRoles: req.body?.no_of_roles,
+        //             publishedDate: req.body?.publish_date,
+        //             dayRate: req.body?.day_rate,
+        //             filename: newJob?.upload?.key || "",
+        //             url: newJob?.upload?.url || ""
+        //         })
+        //         if (!success) {
+        //             console.log(`Failed to send email to ${email}`);
+        //         }
+        //     });
+
+        // } else {
+        //     await InActiveRolesPostedMail(process.env.EMAIL_INACTIVE!, {
+        //         jobTitle: req?.body?.job_title || "",
+        //         start_date: req?.body?.start_date || "",
+        //         client_name: req?.body?.client_name || ""
+        //     })
+        // }
+
+        return res.status(200).json({
+            message: "Job created successfully",
+            status: true,
+            data: newJob
+        })
+    } catch (error: any) {
+        return res.status(400).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};
+
 // Get all jobs
 export const getJobs = async (req: any, res: Response) => {
     try {
@@ -107,7 +200,7 @@ export const getJobs = async (req: any, res: Response) => {
         }
 
         // Common aggregation pipeline with computed fields
-        const aggregationPipeline:any = [
+        const aggregationPipeline: any = [
             { $match: query },
             {
                 $lookup: {
@@ -234,7 +327,84 @@ export const getJobs = async (req: any, res: Response) => {
     }
 };
 
+// Get all jobs CIR
+export const getJobsCIR = async (req: any, res: Response) => {
+    try {
+        const { page, limit, skip } = req.pagination!;
+        const { keyword, job_type } = req.query
+        const user_id = req.user?._id;
 
+        let query: any = { status: 'Active' }
+        if (keyword) {
+            query.job_title = { $regex: keyword, $options: 'i' };
+        }
+
+        if (job_type) {
+            query.job_type = job_type
+        }
+
+        let totalCount = await JobModelCIR.find(query).countDocuments();
+
+        const jobs = await JobModelCIR.aggregate([
+            {
+                $match: query
+            },
+            {
+                $lookup: {
+                    from: "candidatejobapplications",
+                    localField: "candicateApplication",
+                    foreignField: "_id",
+                    as: "candidateApplications"
+                },
+            },
+            {
+                $sort: {
+                    createAt: -1
+                }
+            }
+        ]).skip(skip).limit(limit);
+
+        let jobsWithProcessedData = jobs.map((job: any) => {
+
+            const matchingApplicant = job.candidateApplications.find((applicant: any) => applicant.user_id.toString() === user_id.toString());
+
+            if (matchingApplicant) {
+                job.status = "Applied"
+            }
+
+            return {
+                _id: job._id,
+                job_id: job.job_id,
+                job_title: job.job_title,
+                job_type: job.job_type,
+                no_of_roles: job.no_of_roles,
+                publish_date: job.publish_date,
+                upload: job.upload,
+                status: job.status,
+                // candidateDetails: matchingApplicant
+            };
+        });
+
+        return res.json({
+            message: "Fetched jobs successfully",
+            status: true,
+            data: jobsWithProcessedData,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / limit)
+            }
+        });
+
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
 
 // Get a job by ID
 export const getJobById = async (req: any, res: Response) => {
