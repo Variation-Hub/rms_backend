@@ -811,7 +811,7 @@ export const loginAdmin = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.email })
+        const token = generateToken({ _id: user._id, email: user.email, role: "ACR_ADMIN" })
         return res.status(200).json({
             message: "Admin login success",
             status: true,
