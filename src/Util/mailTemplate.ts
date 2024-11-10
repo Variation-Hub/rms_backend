@@ -243,7 +243,7 @@ export const newJobAlertMailTemplate = (data: any) => {
                 </table>
                 <p>Please review the job details and take the necessary actions as soon as possible.</p>
                 <p>Best regards,<br>
-                <b>ACR Portal</p>
+                <b>SaiVen Technology Solutions Limited</p>
             </div>
         </div>
  `
@@ -403,6 +403,136 @@ export const InActiveRolesPostedMailTemplate = (data: any) => {
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
                     SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}
+
+// CIR MAIL TEMPLATE
+
+export const activeRolesPostedMailTemplateCIR = (data: any) => {
+
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear <b>${data.name},</b></p>
+                <p>We have just posted new active roles in our Candidate Interest Record System, and your prompt response is required.</p>
+                <p>Please log in to the system and review the Active roles under your account. It is essential to mark "Apply" and confirm your interest for each role and further to continue with the same CV or upload a new CV.</p>
+                <p>Access the System Here:
+                <a href="https://rms.saivensolutions.co.uk/#/cir/cir-login" style="display: inline-block; font-weight: bold;">Login to Candidate Interest Record System</a>
+                </p>
+                <p><strong>Steps to Apply for an Active Role:</strong></p>
+                <ol>
+                    <li>Log in to the system.</li>
+                    <li>Navigate to the "Active Roles" section.</li>
+                    <li>Read the ReadMe document which will have all the details related to the Role.</li>
+                    <li>Mark "Apply" for the role in which you are interested.</li>
+                    <li>Select “Continue with the current CV” if you wish to continue with the CV you uploaded within our system during registration.</li>
+                    <li>Select “Upload New CV” if you wish to upload a new CV and this will replace the old CV from the System.</li>
+                    <li>Submit.</li>
+                </ol>
+                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <p>Thank you for your immediate attention.</p>
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br>
+                    SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}
+
+export const newJobAlertMailTemplateCIR = (data: any) => {
+
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear Team,</p>
+                <p>A new job has been posted in our system. Please find the details below:</p>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="border: 1px solid #ddd; text-align: left;">Job Title</th>
+                        <th style="border: 1px solid #ddd; text-align: left;">No. of Roles</th>
+                        <th style="border: 1px solid #ddd; text-align: left;">Published Date</th>
+                        <th style="border: 1px solid #ddd; text-align: left;">Day Rate</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd;">${data.jobTitle}</td>
+                        <td style="border: 1px solid #ddd;">${data.numOfRoles}</td>
+                        <td style="border: 1px solid #ddd;">${data.publishedDate}</td>
+                        <td style="border: 1px solid #ddd;">${data.dayRate}</td>
+                    </tr>
+                </table>
+                <p>Please review the job details and take the necessary actions as soon as possible.</p>
+                <p>Best regards,<br>
+                <b>SaiVen Technology Solutions Limited</p>
+            </div>
+        </div>
+ `
+}
+
+export const uploadCVAlertMailTemplateCIR = (data: any) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear <b>${data.name},</b></p>
+                <p>We have successfully received the CVs you uploaded for the role of <b>${data.role}</b> in our Candidate Interest Record System.</p>
+                
+                <p><strong>Role Details:</strong></p>
+                <ul>
+                    <li><b>Job Role:</b> ${data.role}</li>
+                    <li><b>Client Name:</b> ${data.clientName}</li>
+                    
+                </ul>
+                <p>Thank you for your prompt response and submission of the CVs. Our team will review the CVs and get back to you if any further information or action is needed.</p>
+                <p>If you have any query, please send them to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br>
+                    SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}
+
+export const cvRecivedMailTemplateCIR = (data: any) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear <b>${data.name},</b></p>
+                <p>We have successfully received the new CVs you uploaded for the role of <b>${data.role}</b> in our Candidate Interest Record System.</p>
+                
+                <p><strong>Role Details:</strong></p>
+                <ul>
+                    <li><b>Job Role:</b> ${data.role}</li>
+                    <li><b>Client Name:</b> ${data.clientName}</li>
+                    
+                </ul>
+                <p>Thank you for your prompt response and submission of the CVs. Our team will review the CVs and get back to you if any further information or action is needed.</p>
+                <p>FYI: Your new CV has been saved in our system, you can use it when applying for other jobs too.</p>
+                <p>If you have any query, please send them to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br>
+                    SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}
+
+export const cvReviewMailTemplateCIR = (data: any) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear HR Team,</b></p>
+                <p>We have received interest from a candidate on CIR for the recently posted role of  ${data.title}. Please find the confirmation below:</p>
+                
+                <ul>
+                    <li><b>${data?.id}</b></li>
+                    <li><b>Job Title:</b> ${data.title}</li>
+                    <li><b>Client Name:</b> ${data.clientName}</li>
+                    <li><b>Applied  by:</b> ${data.uploadeBy}</li>
+                    <li><b>Applied  Date:</b> ${data.date}</li>
+                </ul>
+                
+                <p>The vetting process will now be initiated by our Management Consultant (MC) team. Please ensure all necessary steps are followed.</p>
+             
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br/>
+                    SaiVen Technology Solutions Limited Limited
+                    </p>
                 </div>
             </div>
         </div>`

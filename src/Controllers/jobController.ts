@@ -5,8 +5,9 @@ import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
 import CounterCIR from '../Models/JobCountCIR'
 import ACRUserModel from '../Models/ACRUserModel';
-import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, uploadCVAlertMail } from '../Util/nodemailer';
+import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, newJobAlertMailCIR, uploadCVAlertMail } from '../Util/nodemailer';
 import JobModelCIR from '../Models/JobModelCIR';
+import userModel from '../Models/userModel';
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -133,45 +134,36 @@ export const createJobCIR = async (req: Request, res: Response) => {
 
         const newJob = await JobCIR.create({ ...req.body });
 
-        // const allAgengies: any = await ACRUserModel.find();
+        const allAgengies: any = await userModel.find();
 
-        // if (status === 'Active') {
-        //     function delay(ms: number) {
-        //         return new Promise(resolve => setTimeout(resolve, ms));
-        //     }
+        function delay(ms: number) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
-        //     allAgengies?.forEach(async (agent: any, index: number) => {
-        //         if (agent?.personEmail) {
-        //             await delay(index * 1000); // Adding 1-second delay per email
-        //             const success = await activeRolesPostedMail(agent?.personEmail, { name: agent?.agencyName });
-        //             if (!success) {
-        //                 console.log(`Failed to send email to ${agent?.personEmail}`);
-        //             }
-        //         }
-        //     });
+        allAgengies?.forEach(async (agent: any, index: number) => {
+            if (agent?.email) {
+                await delay(index * 1000); // Adding 1-second delay per email
+                const success = await activeRolesPostedMail(agent?.email, { name: agent?.name });
+                if (!success) {
+                    console.log(`Failed to send email to ${agent?.email}`);
+                }
+            }
+        });
 
-        //     process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
-        //         await delay(index * 1000); // Adding 1-second delay per email
-        //         const success = await newJobAlertMail(email, {
-        //             jobTitle: req.body?.job_title,
-        //             numOfRoles: req.body?.no_of_roles,
-        //             publishedDate: req.body?.publish_date,
-        //             dayRate: req.body?.day_rate,
-        //             filename: newJob?.upload?.key || "",
-        //             url: newJob?.upload?.url || ""
-        //         })
-        //         if (!success) {
-        //             console.log(`Failed to send email to ${email}`);
-        //         }
-        //     });
-
-        // } else {
-        //     await InActiveRolesPostedMail(process.env.EMAIL_INACTIVE!, {
-        //         jobTitle: req?.body?.job_title || "",
-        //         start_date: req?.body?.start_date || "",
-        //         client_name: req?.body?.client_name || ""
-        //     })
-        // }
+        process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
+            await delay(index * 1000); // Adding 1-second delay per email
+            const success = await newJobAlertMailCIR(email, {
+                jobTitle: req.body?.job_title,
+                numOfRoles: req.body?.no_of_roles,
+                publishedDate: req.body?.publish_date,
+                dayRate: req.body?.day_rate,
+                filename: newJob?.upload?.key || "",
+                url: newJob?.upload?.url || ""
+            })
+            if (!success) {
+                console.log(`Failed to send email to ${email}`);
+            }
+        });
 
         return res.status(200).json({
             message: "Job created successfully",

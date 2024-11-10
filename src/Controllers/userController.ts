@@ -6,7 +6,7 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrPasswordGeneratedMail, adminMail, adminMailWithPassword, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend } from "../Util/nodemailer"
+import { acrPasswordGeneratedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, uploadCVAlertMailCIR } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
@@ -84,7 +84,7 @@ export const loginUser = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.email, name: user.name, referredBy: user.referredBy, referredCode: user.referredCode })
+        const token = generateToken({ _id: user._id, email: user.email, name: user.name, referredBy: user.referredBy, referredCode: user.referredCode, role: "CIR" })
         return res.status(200).json({
             message: "User login success",
             status: true,
@@ -257,6 +257,41 @@ export const applyJobRole = async (req: any, res: Response) => {
 
         await job.save();
 
+        if (cv) {
+            cvRecivedMailCIR(user?.email, {
+                name: user?.name,
+                role: job?.job_title,
+                filename: job?.upload?.key,
+                url: job?.upload?.url
+            })
+        } else {
+            uploadCVAlertMailCIR(user?.email, {
+                name: user?.name,
+                role: job?.job_title,
+                filename: job?.upload?.key,
+                url: job?.upload?.url
+            })
+        }
+
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(today.getDate()).padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
+
+        cvReviewMailCIR(process.env.EMAIL_ARRAY_JOB_CIR!, {
+            id: job?.job_id,
+            title: job?.job_title,
+            clientName: job?.client_name,
+            uploadeBy: user?.name,
+            date: formattedDate,
+            filename: job?.upload?.key,
+            url: job?.upload?.url,
+            cvUploaded: [user?.cv]
+        })
+
         return res.json({
             message: "Applied for the job successfully",
             status: true,
@@ -337,7 +372,7 @@ export const loginACRUser = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName })
+        const token = generateToken({ _id: user._id, email: user.personEmail, name: user.personName, role: "ACR" })
         return res.status(200).json({
             message: "ACR User login success",
             status: true,

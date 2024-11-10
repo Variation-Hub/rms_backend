@@ -1,5 +1,5 @@
 import path from "path";
-import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvReviewMailTemplate, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, referViaCode, uploadCVAlertMailTemplate } from "./mailTemplate";
+import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
 
 const nodemailer = require('nodemailer');
 
@@ -288,6 +288,126 @@ export async function InActiveRolesPostedMail(reciverEmail: string, data: any) {
             subject: "Notification: Inactive Job Posted in ACR System", // Subject line
             text: ``, // plain text body
             html: InActiveRolesPostedMailTemplate(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+// CIR MAIL
+
+export async function activeRolesPostedMailCIR(reciverEmail: string, data: any) {
+
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "Action Required: Confirm Capacity for New Active Role", // Subject line
+            text: ``, // plain text body
+            html: activeRolesPostedMailTemplateCIR(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+export async function newJobAlertMailCIR(reciverEmail: string, data: any) {
+
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "New Job Posted in the CIR System - Action Required", // Subject line
+            text: ``, // plain text body
+            html: newJobAlertMailTemplateCIR(data), // html body
+            attachments: [
+                {
+                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    path: data?.url, // Path to the file
+                },
+            ],
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+export async function uploadCVAlertMailCIR(reciverEmail: string, data: any) {
+
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
+            text: ``, // plain text body
+            html: uploadCVAlertMailTemplateCIR(data), // html body
+            attachments: [
+                {
+                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    path: data?.url, // Path to the file
+                },
+            ],
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+export async function cvRecivedMailCIR(reciverEmail: string, data: any) {
+
+    try {
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
+            text: ``, // plain text body
+            html: cvRecivedMailTemplateCIR(data), // html body
+        });
+
+        return true;
+
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
+
+export async function cvReviewMailCIR(reciverEmail: string, data: any) {
+
+    try {
+        const attachments = data.cvUploaded.map((attachment: any) => ({
+            filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+            path: attachment.url, // Path to the file
+        }))
+        await transporter.sendMail({
+            from: 'info@saivensolutions.co.uk', // sender address
+            to: reciverEmail, // list of receivers
+            subject: "CIR Job Applied - Vetting Process Initiation", // Subject line
+            text: ``, // plain text body
+            html: cvReviewMailTemplateCIR(data), // html body
+            attachments: [
+                {
+                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    path: data?.url, // Path to the file
+                },
+                ...attachments
+            ],
         });
 
         return true;
