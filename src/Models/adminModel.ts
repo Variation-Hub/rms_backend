@@ -12,6 +12,11 @@ const adminModel = new mongoose.Schema({
         trim: true,
         required: true,
     },
+    role: {
+        type: String,
+        enum: ['CIR_ADMIN', 'ACR_ADMIN', ""],
+        default: ""
+    },
     createdAt: {
         type: Date,
         default: Date.now

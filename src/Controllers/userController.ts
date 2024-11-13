@@ -774,7 +774,7 @@ export const createAdmin = async (req: Request, res: Response) => {
         }
 
         const newUser = await adminModel.create(req.body)
-        const token = generateToken({ _id: newUser._id, email: newUser.email })
+        const token = generateToken({ _id: newUser._id, email: newUser.email, role: newUser.role })
 
         return res.status(200).json({
             message: "Admin registration success",
@@ -811,7 +811,7 @@ export const loginAdmin = async (req: Request, res: Response) => {
             })
         }
 
-        const token = generateToken({ _id: user._id, email: user.email, role: "ACR_ADMIN" })
+        const token = generateToken({ _id: user._id, email: user.email, role: user.role })
         return res.status(200).json({
             message: "Admin login success",
             status: true,
