@@ -184,7 +184,7 @@ export const getJobs = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
         const { keyword, status } = req.query;
-        const userId = req.user._id;
+        const userId = req?.user?._id || "671218f1d697fbd930d2d3ff";
 
         let query: any = {};
         if (keyword) {
@@ -200,6 +200,12 @@ export const getJobs = async (req: any, res: Response) => {
                     localField: 'applicants',
                     foreignField: '_id',
                     as: 'applicantsInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo', // Unwind the applicantsInfo array
+                    preserveNullAndEmptyArrays: true // Keep documents without matches
                 }
             },
             {
@@ -257,7 +263,22 @@ export const getJobs = async (req: any, res: Response) => {
         const paginatedData = await Job.aggregate([
             ...aggregationPipeline,
             { $skip: skip },
-            { $limit: limit }
+            { $limit: limit },
+            {
+                $group: {
+                    _id: '$_id', // Group by the document's unique ID
+                    applicantsInfo: { $push: '$applicantsInfo' }, // Aggregate applicantsInfo into an array
+                    // Merge all other fields into the result
+                    otherFields: { $first: '$$ROOT' }
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: ['$otherFields', { applicantsInfo: '$applicantsInfo' }]
+                    }
+                }
+            }
         ]);
 
         // Process the aggregated results with user-specific calculations
@@ -290,7 +311,7 @@ export const getJobs = async (req: any, res: Response) => {
                 client_name: job.client_name,
                 location: job.location,
                 day_rate: job.day_rate,
-                applicants: job.applicants,
+                applicants: job.applicantsInfo,
                 upload: job.upload,
                 timerEnd: job.timerEnd,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
