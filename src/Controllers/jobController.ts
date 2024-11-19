@@ -209,6 +209,20 @@ export const getJobs = async (req: any, res: Response) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'acrusers',
+                    localField: 'applicantsInfo.user_id', // Field from jobapplications
+                    foreignField: '_id',                 // Field in users collection
+                    as: 'applicantsInfo.userInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo.userInfo', // Unwind the userInfo array
+                    preserveNullAndEmptyArrays: true // Keep documents without matches
+                }
+            },
+            {
                 $addFields: {
                     jobTimeLeft: {
                         $subtract: [new Date(), "$timerEnd"]
