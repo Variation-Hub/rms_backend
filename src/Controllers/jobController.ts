@@ -300,7 +300,7 @@ export const getJobs = async (req: any, res: Response) => {
             const now = new Date();
             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
-            const matchingApplicant = job.applicantsInfo.find((applicant: any) => applicant.user_id.toString() === userId.toString());
+            const matchingApplicant = job.applicantsInfo.find((applicant: any) => applicant?.user_id?.toString() === userId?.toString());
 
             let processedApplicantInfo: any = {};
             if (matchingApplicant) {
