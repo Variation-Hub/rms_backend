@@ -269,20 +269,18 @@ export const getJobs = async (req: any, res: Response) => {
             { $project: { sortStatus: 0 } }
         ];
 
-        // Calculate total count after status filter
         const totalCountData = await Job.aggregate(aggregationPipeline);
         let totalCount = totalCountData.length;
 
-        // Apply pagination
         const paginatedData = await Job.aggregate([
             ...aggregationPipeline,
+            { $sort: { sortStatus: 1, createAt: -1 } },
             { $skip: skip },
             { $limit: limit },
             {
                 $group: {
-                    _id: '$_id', // Group by the document's unique ID
-                    applicantsInfo: { $push: '$applicantsInfo' }, // Aggregate applicantsInfo into an array
-                    // Merge all other fields into the result
+                    _id: '$_id',
+                    applicantsInfo: { $push: '$applicantsInfo' },
                     otherFields: { $first: '$$ROOT' }
                 }
             },
@@ -292,7 +290,8 @@ export const getJobs = async (req: any, res: Response) => {
                         $mergeObjects: ['$otherFields', { applicantsInfo: '$applicantsInfo' }]
                     }
                 }
-            }
+            },
+            { $sort: { sortStatus: 1, createAt: -1 } },
         ]);
 
         // Process the aggregated results with user-specific calculations
@@ -330,7 +329,8 @@ export const getJobs = async (req: any, res: Response) => {
                 timerEnd: job.timerEnd,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: job.dynamicStatus,
-                ...processedApplicantInfo
+                ...processedApplicantInfo,
+                // createAt: job.createAt,
             };
         });
 
