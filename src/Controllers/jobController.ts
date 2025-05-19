@@ -609,7 +609,7 @@ export const applicationJob = async (req: Request, res: Response) => {
             application.status = 'Accepted'
             application.no_of_resouces = resources || application.no_of_resouces
             const now = new Date();
-            application.timer = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            application.timer = new Date(now.getTime() + 120 * 60 * 60 * 1000);
 
         } else {
             application.status = 'Actioned'

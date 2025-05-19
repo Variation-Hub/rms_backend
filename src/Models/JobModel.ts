@@ -71,7 +71,7 @@ JobSchema.pre('save', async function (next) {
         return next();
     }
     const now = new Date();
-    this.timerEnd = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    this.timerEnd = new Date(now.getTime() + 48 * 60 * 60 * 1000);
     next();
 });
 
