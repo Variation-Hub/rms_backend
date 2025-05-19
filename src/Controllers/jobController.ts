@@ -183,6 +183,8 @@ export const createJobCIR = async (req: Request, res: Response) => {
 export const getJobs = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
+
+        console.log("page, limit, skip", page, limit, skip)
         const { keyword, status } = req.query;
         const userId = req?.user?._id || "671218f1d697fbd930d2d3ff";
 
@@ -191,37 +193,9 @@ export const getJobs = async (req: any, res: Response) => {
             query.job_title = { $regex: keyword, $options: 'i' };
         }
 
-        // Common aggregation pipeline with computed fields
-        const aggregationPipeline: any = [
+        // First get the base jobs with pagination
+        const basePipeline: any = [
             { $match: query },
-            {
-                $lookup: {
-                    from: 'jobapplications',
-                    localField: 'applicants',
-                    foreignField: '_id',
-                    as: 'applicantsInfo'
-                }
-            },
-            {
-                $unwind: {
-                    path: '$applicantsInfo', // Unwind the applicantsInfo array
-                    preserveNullAndEmptyArrays: true // Keep documents without matches
-                }
-            },
-            {
-                $lookup: {
-                    from: 'acrusers',
-                    localField: 'applicantsInfo.user_id', // Field from jobapplications
-                    foreignField: '_id',                 // Field in users collection
-                    as: 'applicantsInfo.userInfo'
-                }
-            },
-            {
-                $unwind: {
-                    path: '$applicantsInfo.userInfo', // Unwind the userInfo array
-                    preserveNullAndEmptyArrays: true // Keep documents without matches
-                }
-            },
             {
                 $addFields: {
                     jobTimeLeft: {
@@ -229,25 +203,20 @@ export const getJobs = async (req: any, res: Response) => {
                     },
                     dynamicStatus: {
                         $cond: [
-                            { $lt: [new Date(), "$timerEnd"] },
-                            "Active",
-                            "Expired"
-                        ]
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    dynamicStatus: {
-                        $cond: [
                             { $eq: ["$status", "Inactive"] },
                             "Inactive",
-                            "$dynamicStatus"
+                            {
+                                $cond: [
+                                    { $lt: [new Date(), "$timerEnd"] },
+                                    "Active",
+                                    "Expired"
+                                ]
+                            }
                         ]
                     }
                 }
             },
-            ...(status ? [{ $match: { dynamicStatus: status } }] : []), // Apply filter based on dynamicStatus if status is provided
+            ...(status ? [{ $match: { dynamicStatus: status } }] : []),
             {
                 $addFields: {
                     sortStatus: {
@@ -265,18 +234,51 @@ export const getJobs = async (req: any, res: Response) => {
                     }
                 }
             },
-            { $sort: { sortStatus: 1, createAt: -1 } },
-            { $project: { sortStatus: 0 } }
+            { $sort: { sortStatus: 1, createAt: -1 } }
         ];
 
-        const totalCountData = await Job.aggregate(aggregationPipeline);
+        // Get total count
+        const totalCountData = await Job.aggregate(basePipeline);
         let totalCount = totalCountData.length;
 
-        const paginatedData = await Job.aggregate([
-            ...aggregationPipeline,
-            { $sort: { sortStatus: 1, createAt: -1 } },
+        // Get paginated base data
+        const paginatedBaseData = await Job.aggregate([
+            ...basePipeline,
             { $skip: skip },
-            { $limit: limit },
+            { $limit: limit }
+        ]);
+
+        // Now enrich the paginated data with applicants info
+        const enrichedData = await Job.aggregate([
+            { $match: { _id: { $in: paginatedBaseData.map(job => job._id) } } },
+            {
+                $lookup: {
+                    from: 'jobapplications',
+                    localField: 'applicants',
+                    foreignField: '_id',
+                    as: 'applicantsInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'acrusers',
+                    localField: 'applicantsInfo.user_id',
+                    foreignField: '_id',
+                    as: 'applicantsInfo.userInfo'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$applicantsInfo.userInfo',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $group: {
                     _id: '$_id',
@@ -291,11 +293,11 @@ export const getJobs = async (req: any, res: Response) => {
                     }
                 }
             },
-            { $sort: { sortStatus: 1, createAt: -1 } },
+            { $sort: { sortStatus: 1, createAt: -1 } }
         ]);
 
         // Process the aggregated results with user-specific calculations
-        let jobsWithProcessedData = paginatedData.map((job: any) => {
+        let jobsWithProcessedData = enrichedData.map((job: any) => {
             const now = new Date();
             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
