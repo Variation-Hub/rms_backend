@@ -5,6 +5,7 @@ import { multipleFileUpload } from '../Util/multer';
 import cardRoutes from './cardRoute';
 import clientRoutes from './clientRoute'
 import jobRouters from './jobRoute'
+import contractRoutes from './contractRoute'
 import { paginationMiddleware } from '../Middleware/pagination';
 import userDBAcessRoutes from './databaseModelLogin';
 import { authorizeRolesWithoutErrorDB } from '../Middleware/verifyTokenDBAccess';
@@ -18,6 +19,7 @@ Routes.use("/user", userDBAcessRoutes);
 Routes.use("/card", cardRoutes);
 Routes.use("/client", clientRoutes);
 Routes.use("/acr", jobRouters)
+Routes.use("/acr-contract", contractRoutes)
 Routes.use("/candidate", CandidateRoute);
 Routes.use("/futures/card", futureCard)
 
