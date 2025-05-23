@@ -409,7 +409,8 @@ export const getACRUsers = async (req: Request, res: Response) => {
 
         const users = await ACRUserModel.find(query)
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "ACR Users fetch successfully",

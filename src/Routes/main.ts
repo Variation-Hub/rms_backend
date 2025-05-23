@@ -10,6 +10,7 @@ import { paginationMiddleware } from '../Middleware/pagination';
 import userDBAcessRoutes from './databaseModelLogin';
 import { authorizeRolesWithoutErrorDB } from '../Middleware/verifyTokenDBAccess';
 import CandidateRoute from './candidateRoute'
+import contractDetailsRoutes from './contractDetailsRoutes'
 import futureCard from './futureCardRoute'
 
 const Routes = express.Router();
@@ -20,6 +21,7 @@ Routes.use("/card", cardRoutes);
 Routes.use("/client", clientRoutes);
 Routes.use("/acr", jobRouters)
 Routes.use("/acr-contract", contractRoutes)
+Routes.use("/acr-detail-contract", contractDetailsRoutes)
 Routes.use("/candidate", CandidateRoute);
 Routes.use("/futures/card", futureCard)
 

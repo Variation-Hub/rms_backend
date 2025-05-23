@@ -50,7 +50,7 @@ const JobSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'JobApplication',
     }],
-    candicateApplication:[{
+    candicateApplication: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'CandidateApplication',
         required: true
@@ -60,7 +60,15 @@ const JobSchema = new mongoose.Schema({
         default: {
         }
     },
-    createAt:{
+    jobExpireDate: {
+        type: Date,
+        default: function() {
+            const date = new Date();
+            date.setDate(date.getDate() + 7); // Add 7 days to current date
+            return date;
+        }
+    },
+    createAt: {
         type: Date,
         default: Date.now
     }
