@@ -11,6 +11,11 @@ const userModelDatabase = new mongoose.Schema({
         type: String,
         required: true,
     },
+    role: {
+        type: String,
+        required: false,
+        default : 'DATA_BASE_USER'
+    },
     email: {
         type: String,
         unique: true,
