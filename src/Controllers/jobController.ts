@@ -402,6 +402,10 @@ export const getJobsCIR = async (req: any, res: Response) => {
                 job.status = "Applied"
             }
 
+            if (job.jobExpireDate < new Date()) {
+                job.status = "Expired";
+            }
+
             return {
                 _id: job._id,
                 job_id: job.job_id,
