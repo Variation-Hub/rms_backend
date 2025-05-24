@@ -329,7 +329,7 @@ export const getJobs = async (req: any, res: Response) => {
                 applicants: job.applicantsInfo,
                 upload: job.upload,
                 timerEnd: job.timerEnd,
-                jobExpireDate : job?.jobExpireDate,
+                jobExpireDate: job?.jobExpireDate,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: job.dynamicStatus,
                 ...processedApplicantInfo,
@@ -411,6 +411,7 @@ export const getJobsCIR = async (req: any, res: Response) => {
                 publish_date: job.publish_date,
                 upload: job.upload,
                 status: job.status,
+                jobExpireDate: job.jobExpireDate
                 // candidateDetails: matchingApplicant
             };
         });
