@@ -724,7 +724,23 @@ export const updateACRUser = async (req: any, res: Response) => {
     try {
         const user_id = req.user;
 
-        const { appliedRole, profile } = req.body;
+        const { 
+            appliedRole, 
+            profile,
+            agencyName,
+            location,
+            numberOfBranchesInUK,
+            personName,
+            personDesignation,
+            personEmail,
+            phoneNumberCountryCode,
+            phoneNumber,
+            secondaryContectName,
+            secondaryDesignation,
+            secondaryEmail,
+            secondaryPhoneNumber,
+            secondaryPhoneNumberCountryCode 
+        } = req.body;
 
         const user = await ACRUserModel.findById(user_id);
 
@@ -738,13 +754,29 @@ export const updateACRUser = async (req: any, res: Response) => {
 
         user.appliedRole = appliedRole || user?.appliedRole;
         user.profile = profile || user?.profile;
+
+        user.agencyName = agencyName || user?.agencyName;
+        user.location = location || user?.location;
+        user.numberOfBranchesInUK = numberOfBranchesInUK || user?.numberOfBranchesInUK;
+        user.personName = personName || user?.personName;
+        user.personDesignation = personDesignation || user?.personDesignation;
+        user.personEmail = personEmail || user?.personEmail;
+        user.phoneNumberCountryCode = phoneNumberCountryCode || user?.phoneNumberCountryCode;
+        user.phoneNumber = phoneNumber || user?.phoneNumber;
+        user.secondaryContectName = secondaryContectName || user?.secondaryContectName;
+        user.secondaryDesignation = secondaryDesignation || user?.secondaryDesignation;
+        user.secondaryEmail = secondaryEmail || user?.secondaryEmail;
+        user.secondaryPhoneNumberCountryCode = secondaryPhoneNumberCountryCode || user?.secondaryPhoneNumberCountryCode;
+        user.secondaryPhoneNumber = secondaryPhoneNumber || user?.secondaryPhoneNumber;
+        user.contectTime = user?.contectTime;
+
         await user.save();
 
-        acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail });
+        // acrPasswordGeneratedMail(user.personEmail, { name: user.personName, ccEmail: user.secondaryEmail });
 
-        process.env.EMAIL_ARRAY?.split(" ")?.forEach((item: string) => {
-            adminMail(item, { agencyName: user?.agencyName, name: user.personName, email: user.personEmail, phone: user?.phoneNumber })
-        })
+        // process.env.EMAIL_ARRAY?.split(" ")?.forEach((item: string) => {
+        //     adminMail(item, { agencyName: user?.agencyName, name: user.personName, email: user.personEmail, phone: user?.phoneNumber })
+        // })
 
         return res.status(200).json({
             message: "User updated successfully",
