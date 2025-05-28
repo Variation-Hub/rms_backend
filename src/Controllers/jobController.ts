@@ -182,6 +182,7 @@ export const createJobCIR = async (req: Request, res: Response) => {
 // Get all jobs
 export const getJobs = async (req: any, res: Response) => {
     try {
+        console.log("============")
         const { page, limit, skip } = req.pagination!;
 
         console.log("page, limit, skip", page, limit, skip)
@@ -415,7 +416,11 @@ export const getJobsCIR = async (req: any, res: Response) => {
                 publish_date: job.publish_date,
                 upload: job.upload,
                 status: job.status,
-                jobExpireDate: job.jobExpireDate
+                jobExpireDate: job.jobExpireDate,
+                start_date: job.start_date,
+                client_name: job.client_name,
+                location: job.location,
+                day_rate: job.day_rate,
                 // candidateDetails: matchingApplicant
             };
         });
@@ -565,6 +570,25 @@ export const updateJob = async (req: Request, res: Response) => {
 export const deleteJob = async (req: Request, res: Response) => {
     try {
         const job = await Job.findByIdAndDelete(req.params.id);
+        if (!job) return res.status(404).json({ message: "Job not found" });
+        return res.status(200).json({
+            message: "Job deleted successfully",
+            status: true,
+            data: null
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};
+
+// Delete a job
+export const deleteCIRJob = async (req: Request, res: Response) => {
+    try {
+        const job = await JobModelCIR.findByIdAndDelete(req.params.id);
         if (!job) return res.status(404).json({ message: "Job not found" });
         return res.status(200).json({
             message: "Job deleted successfully",

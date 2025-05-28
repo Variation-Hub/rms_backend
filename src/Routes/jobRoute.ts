@@ -10,7 +10,8 @@ import {
     fetchJobId,
     createJobCIR,
     fetchJobIdCIR,
-    getJobsCIR
+    getJobsCIR,
+    deleteCIRJob
 } from '../Controllers/jobController';
 import { paginationMiddleware } from '../Middleware/pagination';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -33,5 +34,6 @@ router.get("/job/fetch/id/cir", authorizeRoles(), fetchJobIdCIR)
 
 router.put('/jobs/:id', authorizeRoles(), updateJob);
 router.delete('/jobs/:id', authorizeRoles(), deleteJob);
+router.delete('/jobs/cir/:id', authorizeRoles(), deleteCIRJob);
 
 export default router;

@@ -27,6 +27,10 @@ const FutureCardSchema = new mongoose.Schema({
         enum: [0, 1],
         default: 1
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
 }, { versionKey: false });
 
 export default mongoose.model('FutureCardSchema', FutureCardSchema);
