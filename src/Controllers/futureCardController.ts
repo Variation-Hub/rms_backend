@@ -68,7 +68,7 @@ export const getAllCard = async (req: Request, res: Response) => {
         }
 
         const totalCount = await FutureCard.countDocuments(query);
-        const cards = await FutureCard.find(query, { roles: 0 }).skip(skip).limit(limit);
+        const cards = await FutureCard.find(query).skip(skip).limit(limit);
         res.status(200).json({
             status: true,
             message: "Cards retrieved successfully",

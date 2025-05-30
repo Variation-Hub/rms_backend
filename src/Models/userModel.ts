@@ -44,7 +44,7 @@ const userModel = new mongoose.Schema({
         type: String,
         default: ""
     },
-    noticePeriodDay :{
+    noticePeriodDay: {
         type: String,
         default: ""
     },
@@ -61,7 +61,7 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
-    referredCode:{
+    referredCode: {
         type: String,
         trim: true,
         default: "0",
@@ -77,6 +77,10 @@ const userModel = new mongoose.Schema({
         default: "",
     },
     lookingFor: {
+        type: [String],
+        default: [],
+    },
+    workPreference: {
         type: [String],
         default: [],
     },
@@ -113,11 +117,11 @@ const userModel = new mongoose.Schema({
         trim: true,
         default: "",
     },
-    sc_dv_clearance_hold:{
+    sc_dv_clearance_hold: {
         type: Boolean,
         default: false
     },
-    willing_to_undertake:{
+    willing_to_undertake: {
         type: String,
         trim: true,
         default: ""
@@ -139,6 +143,62 @@ const userModel = new mongoose.Schema({
         }
     },
     client3: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client4: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client5: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client6: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client7: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client8: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client9: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            name: "",
+            location: "",
+            roles: []
+        }
+    },
+    client10: {
         type: mongoose.Schema.Types.Mixed,
         default: {
             name: "",

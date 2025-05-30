@@ -19,6 +19,7 @@ router.post('/', authorizeRoles(), createCard);
 router.post('/:id', authorizeRoles(), createRole);
 
 router.get('/', authorizeRoles(), paginationMiddleware, getAllCard);
+router.get('/public', paginationMiddleware, getAllCard);
 
 router.get('/:id', authorizeRoles(), paginationMiddleware, getCardById);
 

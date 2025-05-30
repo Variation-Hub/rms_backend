@@ -39,7 +39,12 @@ export const createUser = async (req: Request, res: Response) => {
         if (req.body.lookingFor) {
             lookingFor = req.body.lookingFor.split(',')
         }
-        const newUser = await userModel.create({ ...req.body, lookingFor, referredCode: referredCode.code })
+
+        let workPreference = [];
+        if (req.body.workPreference) {
+            workPreference = req.body.workPreference.split(',')
+        }
+        const newUser = await userModel.create({ ...req.body, lookingFor, workPreference,  referredCode: referredCode.code })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredCode: referredCode.code, referredBy: newUser.referredBy })
 
         referredCode.code += 1;
