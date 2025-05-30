@@ -55,12 +55,16 @@ export const getAllCard = async (req: Request, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
 
-        const { keyword } = req.query
+        const { keyword, active } = req.query
 
         const query: any = {}
 
         if (keyword) {
             query.name = { $regex: keyword, $options: "i" }
+        }
+
+        if (active) {
+            query.active = active == '1' ? 1 : 0
         }
 
         const totalCount = await FutureCard.countDocuments(query);

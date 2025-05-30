@@ -19,6 +19,11 @@ const FutureCardSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    location: {
+        type: String,
+        trim: true,
+        default: null
+    },
     roles: {
         type: [RolesSchema]
     },
