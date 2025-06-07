@@ -57,7 +57,7 @@ const JobSchemaCIR = new mongoose.Schema({
     },
     jobExpireDate: {
         type: Date,
-        default: function() {
+        default: function () {
             const date = new Date();
             date.setDate(date.getDate() + 7); // Add 7 days to current date
             return date;

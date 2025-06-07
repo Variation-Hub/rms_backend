@@ -44,7 +44,7 @@ export const createUser = async (req: Request, res: Response) => {
         if (req.body.workPreference) {
             workPreference = req.body.workPreference.split(',')
         }
-        const newUser = await userModel.create({ ...req.body, lookingFor, workPreference,  referredCode: referredCode.code })
+        const newUser = await userModel.create({ ...req.body, lookingFor, workPreference, referredCode: referredCode.code })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredCode: referredCode.code, referredBy: newUser.referredBy })
 
         referredCode.code += 1;
@@ -212,7 +212,7 @@ export const applyJobRole = async (req: any, res: Response) => {
     try {
         const user_id = req.user?._id;
         const { job_id } = req.params
-        const { cv } = req.body
+        const { cv, workPreference } = req.body
 
         const applied = await CandidateJobApplication.findOne({
             job_id,
@@ -251,11 +251,11 @@ export const applyJobRole = async (req: any, res: Response) => {
             await user.save();
         }
 
-
         const jobApplication = await CandidateJobApplication.create({
             user_id,
             job_id,
-            cvDetails: user.cv
+            cvDetails: user.cv,
+            workPreference: workPreference ? (workPreference?.split(',') || []) : []
         });
 
         job.candicateApplication.push(jobApplication?._id);
@@ -729,8 +729,8 @@ export const updateACRUser = async (req: any, res: Response) => {
     try {
         const user_id = req.user;
 
-        const { 
-            appliedRole, 
+        const {
+            appliedRole,
             profile,
             agencyName,
             location,
@@ -744,7 +744,7 @@ export const updateACRUser = async (req: any, res: Response) => {
             secondaryDesignation,
             secondaryEmail,
             secondaryPhoneNumber,
-            secondaryPhoneNumberCountryCode 
+            secondaryPhoneNumberCountryCode
         } = req.body;
 
         const user = await ACRUserModel.findById(user_id);

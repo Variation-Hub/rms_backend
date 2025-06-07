@@ -24,6 +24,10 @@ const CandidateJobApplication = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {}
     },
+    workPreference: {
+        type: [String],
+        default: [],
+    },
     createdAt: {
         type: Date,
         default: Date.now

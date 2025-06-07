@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 
 export const transporter = nodemailer.createTransport({
     // host: "live.smtp.mailtrap.io",
-    host: 'gmail',
+    host: 'smtp.gmail.com',
     port: 587,
     auth: {
         user: "darshandumaraliya@gmail.com",
@@ -142,6 +142,7 @@ export async function acrPasswordGeneratedMail(reciverEmail: string, data: any) 
 export async function activeRolesPostedMail(reciverEmail: string, data: any) {
 
     try {
+        console.log("=============== email call ====================")
         await transporter.sendMail({
             // from: 'info@saivensolutions.co.uk', // sender address
             from: senderMail,
@@ -151,11 +152,11 @@ export async function activeRolesPostedMail(reciverEmail: string, data: any) {
             text: ``, // plain text body
             html: activeRolesPostedMailTemplate(data), // html body
         });
-
+        console.log("=============== email call ====================, done send")
         return true;
 
     } catch (err) {
-        console.log(err)
+        console.log("=========== send error =========== ", err)
         return false;
     }
 }
