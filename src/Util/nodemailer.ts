@@ -39,8 +39,8 @@ export async function forgotEmailSend(data: any) {
         await transporter.sendMail({
             // from: 'info@saivensolutions.co.uk', // sender address
             from: senderMail,
-            // to: data.email, // list of receivers
-            to: ['ayush@westgateithub.com'],
+            to: data.email, // list of receivers
+            // to: ['ayush@westgateithub.com'],
             subject: "Reset Your Password for SaiVen Technology Solutions Limited Account", // Subject line
             text: `reset link ${data.link}`, // plain text body
             html: generateEmailTemplateForgotPassword(data), // html body

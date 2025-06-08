@@ -15,7 +15,8 @@ import JobModel from "../Models/JobModel"
 import JobModelCIR from "../Models/JobModelCIR"
 const { Parser } = require('json2csv');
 
-const url = 'https://rms.saivensolutions.co.uk';
+// const url = 'https://rms.saivensolutions.co.uk';
+const url = 'https://rms.whyqtech.com';
 
 export const createUser = async (req: Request, res: Response) => {
     try {

@@ -198,7 +198,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                 <p>We have just posted new active roles in our Agency Capacity Record System, and your prompt response is required.</p>
                 <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within <b>2 hours</b>. Additionally, please upload the CVs within 24 hours of confirming.</p>
                 <p>Access the System Here:
-                <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
+                <a href="https://rms.whyqtech.com/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p><strong>Important:</strong> The posted jobs will only be valid for 2 hours, so please respond within this timeframe.</p>
                 <p><strong>Steps to Confirm:</strong></p>
@@ -266,7 +266,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                 </ul>
                 
                 <p> <b>Upload CV(s) Here:</b>
-                <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
+                <a href="https://rms.whyqtech.com/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
                 <p>Please ensure that the CV(s) are uploaded within the specified timeframe. Please note that if you do not upload within the given timeframe, your agreement to supply candidates could be revoked.</p>
                 <p><strong>Steps to Upload CV:</strong></p>
@@ -418,7 +418,7 @@ export const activeRolesPostedMailTemplateCIR = (data: any) => {
                 <p>We have just posted new active roles in our Candidate Interest Record System, and your prompt response is required.</p>
                 <p>Please log in to the system and review the Active roles under your account. It is essential to mark "Apply" and confirm your interest for each role and further to continue with the same CV or upload a new CV.</p>
                 <p>Access the System Here:
-                <a href="https://rms.saivensolutions.co.uk/#/cir/cir-login" style="display: inline-block; font-weight: bold;">Login to Candidate Interest Record System</a>
+                <a href="https://rms.whyqtech.com/#/cir/cir-login" style="display: inline-block; font-weight: bold;">Login to Candidate Interest Record System</a>
                 </p>
                 <p><strong>Steps to Apply for an Active Role:</strong></p>
                 <ol>
