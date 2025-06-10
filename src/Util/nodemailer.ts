@@ -3,27 +3,27 @@ import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, active
 
 const nodemailer = require('nodemailer');
 
-export const transporter = nodemailer.createTransport({
-    // host: "live.smtp.mailtrap.io",
-    host: 'smtp.gmail.com',
-    port: 587,
-    auth: {
-        user: "darshandumaraliya@gmail.com",
-        // pass: "6032e77ba3996b3696c7b9c5b8fc8d4e"
-        pass: "znoq rnha mjif undr"
-    }
-});
-
-
 // export const transporter = nodemailer.createTransport({
-//     host: 'smtp.office365.com',
+//     // host: "live.smtp.mailtrap.io",
+//     host: 'smtp.gmail.com',
 //     port: 587,
-//     secure: false, // Use TLS (not SSL)
 //     auth: {
-//         user: 'info@saivensolutions.co.uk',
-//         pass: 'Swindon@99'
+//         user: "darshandumaraliya@gmail.com",
+//         // pass: "6032e77ba3996b3696c7b9c5b8fc8d4e"
+//         pass: "znoq rnha mjif undr"
 //     }
 // });
+
+
+export const transporter = nodemailer.createTransport({
+    host: 'smtp.office365.com',
+    port: 587,
+    secure: false, // Use TLS (not SSL)
+    auth: {
+        user: 'info@saivensolutions.co.uk',
+        pass: 'S@!ven%01'
+    }
+});
 
 transporter.verify((error: any, success: any) => {
     if (error) {
@@ -39,6 +39,7 @@ const senderMail = "darshandumaraliya@gmail.com";
 
 const { Client } = require('@microsoft/microsoft-graph-client');
 const { ClientSecretCredential } = require('@azure/identity');
+import axios from 'axios';
 
 // Initialize Graph Client
 const credential = new ClientSecretCredential(
@@ -64,6 +65,8 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
         ? to.map(email => ({ emailAddress: { address: email } }))
         : [{ emailAddress: { address: to } }];
 
+    const mail: string = "info@saivensolutions.co.uk"
+
     const message = {
         message: {
             subject,
@@ -74,7 +77,7 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
             toRecipients: recipients,
             from: {
                 emailAddress: {
-                    address: senderMail,
+                    address: mail,
                 },
             },
         },
@@ -83,13 +86,89 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
 
     try {
         await graphClient
-            .api(`/users/${senderMail}/sendMail`)
+            .api(`/users/${mail}/sendMail`)
             .post(message);
         console.log(`Graph Email sent to: ${Array.isArray(to) ? to.join(', ') : to}`);
     } catch (error) {
         console.error('Failed to send mail via Microsoft Graph:', error);
         throw new Error('Graph Email sending failed');
     }
+}
+
+export async function sendGraphMail(options: any): Promise<void> {
+    const mail: string = "info@saivensolutions.co.uk"
+
+    const message = {
+        message: {
+            subject: options.subject,
+            body: {
+                contentType: 'HTML',
+                content: options.htmlBody,
+            },
+            toRecipients: options.to.map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            ccRecipients: (options.cc || []).map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            from: {
+                emailAddress: {
+                    address: mail,
+                },
+            },
+        },
+        saveToSentItems: 'false',
+    };
+
+    await graphClient
+        .api(`/users/${mail}/sendMail`)
+        .post(message);
+}
+
+export async function sendGraphMailWithAttachment(options: any): Promise<void> {
+    const mail: string = "info@saivensolutions.co.uk"
+
+    const toRecipients = options.to.map((email: any) => ({
+        emailAddress: { address: email },
+    }));
+
+    const attachments = [];
+
+    if (options.attachments?.length) {
+        for (const file of options.attachments) {
+            const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+            const base64Data = Buffer.from(response.data).toString('base64');
+
+            attachments.push({
+                '@odata.type': '#microsoft.graph.fileAttachment',
+                name: file.name,
+                contentBytes: base64Data,
+                contentType: 'application/octet-stream',
+            });
+        }
+    }
+
+    const message = {
+        message: {
+            subject: options.subject,
+            body: {
+                contentType: 'HTML',
+                content: options.htmlBody,
+            },
+            toRecipients,
+            attachments,
+            from: {
+                emailAddress: {
+                    address: mail,
+                },
+            },
+        },
+        saveToSentItems: 'false',
+    };
+
+    await graphClient
+        .api(`/users/${mail}/sendMail`)
+        .post(message);
 }
 
 /**
@@ -288,244 +367,476 @@ export async function responseEmailSend(data: any): Promise<boolean> {
 
 // ACR Mail
 
-// Remaining
-export async function acrPasswordGeneratedMail(reciverEmail: string, data: any) {
+//
 
+
+export async function acrPasswordGeneratedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            to: ['ayush@westgateithub.com'],
-            // to: reciverEmail, // list of receivers
-            // cc: data.ccEmail,
-            cc: ['ayush@westgateithub.com'],
-            subject: "Thank You for Registering with SaiVen ACR System", // Subject line
-            text: ``, // plain text body
-            html: acrPasswordGeneratedMailTemplate(data), // html body
+        const subject = "Thank You for Registering with SaiVen ACR System";
+        const htmlBody = acrPasswordGeneratedMailTemplate(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            cc: data.ccEmail || [],
+            subject,
+            htmlBody,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("ACR mail send error:", err);
         return false;
     }
 }
 
-export async function activeRolesPostedMail(reciverEmail: string, data: any) {
+// export async function acrPasswordGeneratedMail(reciverEmail: string, data: any) {
 
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             to: ['ayush@westgateithub.com'],
+//             // to: reciverEmail, // list of receivers
+//             // cc: data.ccEmail,
+//             cc: ['ayush@westgateithub.com'],
+//             subject: "Thank You for Registering with SaiVen ACR System", // Subject line
+//             text: ``, // plain text body
+//             html: acrPasswordGeneratedMailTemplate(data), // html body
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function activeRolesPostedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        console.log("=============== email call ====================")
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Immediate Action Required: Confirm Capacity for New Active Role(s) within 48 Hours", // Subject line
-            text: ``, // plain text body
-            html: activeRolesPostedMailTemplate(data), // html body
-        });
-        console.log("=============== email call ====================, done send")
-        return true;
+        console.log("=============== email call ====================");
 
+        const subject = "Immediate Action Required: Confirm Capacity for New Active Role(s) within 48 Hours";
+        const htmlBody = activeRolesPostedMailTemplate(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+        });
+
+        console.log("=============== email call ==================== done send");
+        return true;
     } catch (err) {
-        console.log("=========== send error =========== ", err)
+        console.error("=========== send error =========== ", err);
         return false;
     }
 }
 
-export async function newJobAlertMail(reciverEmail: string, data: any) {
+// export async function activeRolesPostedMail(reciverEmail: string, data: any) {
 
+//     try {
+//         console.log("=============== email call ====================")
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Immediate Action Required: Confirm Capacity for New Active Role(s) within 48 Hours", // Subject line
+//             text: ``, // plain text body
+//             html: activeRolesPostedMailTemplate(data), // html body
+//         });
+//         console.log("=============== email call ====================, done send")
+//         return true;
+
+//     } catch (err) {
+//         console.log("=========== send error =========== ", err)
+//         return false;
+//     }
+// }
+
+
+export async function newJobAlertMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "New Job Posted in the System - Action Required", // Subject line
-            text: ``, // plain text body
-            html: newJobAlertMailTemplate(data), // html body
-            attachments: [
-                {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
-                },
-            ],
+        const subject = "New Job Posted in the System - Action Required";
+        const htmlBody = newJobAlertMailTemplate(data);
+
+        const attachment = {
+            name: data.filename?.substring(data.filename.indexOf('_') + 1) || 'job-details.pdf',
+            url: data.url,
+        };
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+            attachments: [attachment],
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error:', err);
         return false;
     }
 }
 
-export async function uploadCVAlertMail(reciverEmail: string, data: any) {
+// export async function newJobAlertMail(reciverEmail: string, data: any) {
 
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "New Job Posted in the System - Action Required", // Subject line
+//             text: ``, // plain text body
+//             html: newJobAlertMailTemplate(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function uploadCVAlertMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours", // Subject line
-            text: ``, // plain text body
-            html: uploadCVAlertMailTemplate(data), // html body
-            attachments: [
-                {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
-                },
-            ],
+        const subject = "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours";
+        const htmlBody = uploadCVAlertMailTemplate(data);
+
+        const attachment = {
+            name: data.filename?.substring(data.filename.indexOf('_') + 1) || 'cv-document.pdf',
+            url: data.url,
+        };
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+            attachments: [attachment],
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error (uploadCVAlertMail):', err);
         return false;
     }
 }
 
-export async function cvRecivedMail(reciverEmail: string, data: any) {
+// export async function uploadCVAlertMail(reciverEmail: string, data: any) {
 
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours", // Subject line
+//             text: ``, // plain text body
+//             html: uploadCVAlertMailTemplate(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function cvRecivedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Confirmation: CVs Successfully Submitted", // Subject line
-            text: ``, // plain text body
-            html: cvRecivedMailTemplate(data), // html body
+        const subject = "Confirmation: CVs Successfully Submitted";
+        const htmlBody = cvRecivedMailTemplate(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error (cvRecivedMail):', err);
         return false;
     }
 }
 
-export async function cvReviewMail(reciverEmail: string, data: any) {
+// export async function cvRecivedMail(reciverEmail: string, data: any) {
 
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Confirmation: CVs Successfully Submitsted", // Subject line
+//             text: ``, // plain text body
+//             html: cvRecivedMailTemplate(data), // html body
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function cvReviewMail(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        const attachments = data.cvUploaded.map((attachment: any) => ({
-            filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-            path: attachment.url, // Path to the file
-        }))
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "CVs Uploaded - Vetting Process Initiation", // Subject line
-            text: ``, // plain text body
-            html: cvReviewMailTemplate(data), // html body
-            attachments: [
-                {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
-                },
-                ...attachments
-            ],
+        const attachments: any[] = [
+            {
+                filename: data.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
+                url: data.url,
+            },
+            ...data.cvUploaded.map((file: any) => ({
+                filename: file.filename?.substring(file.filename.indexOf('_') + 1) || 'cv',
+                url: file.url,
+            })),
+        ];
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail],
+            subject: "CVs Uploaded - Vetting Process Initiation",
+            htmlBody: cvReviewMailTemplate(data),
+            attachments,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error (cvReviewMail):', err);
         return false;
     }
 }
 
-export async function adminMail(reciverEmail: string, data: any) {
+// export async function cvReviewMail(reciverEmail: string, data: any) {
 
+//     try {
+//         const attachments = data.cvUploaded.map((attachment: any) => ({
+//             filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//             path: attachment.url, // Path to the file
+//         }))
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "CVs Uploaded - Vetting Process Initiation", // Subject line
+//             text: ``, // plain text body
+//             html: cvReviewMailTemplate(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//                 ...attachments
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function adminMail(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "New User Registering with SaiVen ACR System", // Subject line
-            text: ``, // plain text body
-            html: adminMailTemplate(data), // html body
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject: "New User Registering with SaiVen ACR System",
+            htmlBody: adminMailTemplate(data),
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error (adminMail):', err);
         return false;
     }
 }
+
+// export async function adminMail(reciverEmail: string, data: any) {
+
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "New User Registering with SaiVen ACR System", // Subject line
+//             text: ``, // plain text body
+//             html: adminMailTemplate(data), // html body
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
 
 // Done
-export async function adminMailWithPassword(reciverEmail: string, data: any) {
+
+
+export async function adminMailWithPassword(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            // to: ['ayush@westgateithub.com'],
-            to: ['rmswestgate@gmail.com', 'jamie.thompson@saivensolutions.co.uk'], // Done
-            subject: "New User Registering with SaiVen ACR System", // Subject line
-            text: ``, // plain text body
-            html: adminMailWithPhoneTemplate(data), // html body
+        await sendGraphMail({
+            to: ['rmswestgate@gmail.com', 'jamie.thompson@saivensolutions.co.uk'],
+            subject: "New User Registering with SaiVen ACR System",
+            htmlBody: adminMailWithPhoneTemplate(data),
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error('Graph email send error (adminMailWithPassword):', err);
         return false;
     }
 }
 
-export async function InActiveRolesPostedMail(reciverEmail: string, data: any) {
+// export async function adminMailWithPassword(reciverEmail: string, data: any) {
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             // to: ['ayush@westgateithub.com'],
+//             to: ['rmswestgate@gmail.com', 'jamie.thompson@saivensolutions.co.uk'], // Done
+//             subject: "New User Registering with SaiVen ACR System", // Subject line
+//             text: ``, // plain text body
+//             html: adminMailWithPhoneTemplate(data), // html body
+//         });
 
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function InActiveRolesPostedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Notification: Inactive Job Posted in ACR System", // Subject line
-            text: ``, // plain text body
-            html: InActiveRolesPostedMailTemplate(data), // html body
+        const subject = "Notification: Inactive Job Posted in ACR System";
+        const htmlBody = InActiveRolesPostedMailTemplate(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("Graph email send error (InActiveRolesPostedMail):", err);
         return false;
     }
 }
+
+// export async function InActiveRolesPostedMail(reciverEmail: string, data: any) {
+
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Notification: Inactive Job Posted in ACR System", // Subject line
+//             text: ``, // plain text body
+//             html: InActiveRolesPostedMailTemplate(data), // html body
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
 
 // CIR MAIL
-export async function activeRolesPostedMailCIR(reciverEmail: string, data: any) {
 
+export async function activeRolesPostedMailCIR(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Action Required: Confirm Capacity for New Active Role", // Subject line
-            text: ``, // plain text body
-            html: activeRolesPostedMailTemplateCIR(data), // html body
+        const subject = "Action Required: Confirm Capacity for New Active Role";
+        const htmlBody = activeRolesPostedMailTemplateCIR(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("Graph email send error (activeRolesPostedMailCIR):", err);
         return false;
     }
 }
+
+// export async function activeRolesPostedMailCIR(reciverEmail: string, data: any) {
+
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Action Required: Confirm Capacity for New Active Role", // Subject line
+//             text: ``, // plain text body
+//             html: activeRolesPostedMailTemplateCIR(data), // html body
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
 
 export async function newJobAlertMailCIR(reciverEmail: string, data: any) {
 
