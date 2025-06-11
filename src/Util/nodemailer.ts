@@ -1,7 +1,7 @@
-import path from "path";
+// import path from "path";
 import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
 
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 
 // export const transporter = nodemailer.createTransport({
 //     // host: "live.smtp.mailtrap.io",
@@ -15,25 +15,25 @@ const nodemailer = require('nodemailer');
 // });
 
 
-export const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com',
-    port: 587,
-    secure: false, // Use TLS (not SSL)
-    auth: {
-        user: 'info@saivensolutions.co.uk',
-        pass: 'S@!ven%01'
-    }
-});
+// export const transporter = nodemailer.createTransport({
+//     host: 'smtp.office365.com',
+//     port: 587,
+//     secure: false, // Use TLS (not SSL)
+//     auth: {
+//         user: 'info@saivensolutions.co.uk',
+//         pass: 'S@!ven%01'
+//     }
+// });
 
-transporter.verify((error: any, success: any) => {
-    if (error) {
-        console.log('SMTP Error:', error);
-    } else {
-        console.log('Server is ready to take messages');
-    }
-});
+// transporter.verify((error: any, success: any) => {
+//     if (error) {
+//         console.log('SMTP Error:', error);
+//     } else {
+//         console.log('Server is ready to take messages');
+//     }
+// });
 
-const senderMail = "darshandumaraliya@gmail.com";
+// const senderMail = "darshandumaraliya@gmail.com";
 
 // ================================= New code ====================================================
 
@@ -185,8 +185,6 @@ export async function emailHelper(reciverEmail: string, data: any, user: any) {
     }
 }
 
-
-
 // export async function emailHelper(reciverEmail: string, data: any, user: any) {
 
 //     try {
@@ -206,6 +204,7 @@ export async function emailHelper(reciverEmail: string, data: any, user: any) {
 // }
 
 // Converted function using Microsoft Graph API
+
 export async function forgotEmailSend(data: any) {
     try {
         console.log("data.email", data.email);
@@ -838,109 +837,220 @@ export async function activeRolesPostedMailCIR(
 //     }
 // }
 
-export async function newJobAlertMailCIR(reciverEmail: string, data: any) {
 
+export async function newJobAlertMailCIR(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "New Job Posted in the CIR System - Action Required", // Subject line
-            text: ``, // plain text body
-            html: newJobAlertMailTemplateCIR(data), // html body
-            attachments: [
+        const subject = "New Job Posted in the CIR System - Action Required";
+        const htmlBody = newJobAlertMailTemplateCIR(data);
+
+        const attachments = data?.url
+            ? [
+                {
+                    filename: data.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
+                    url: data.url,
+                }
+            ]
+            : [];
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+            attachments,
+        });
+
+        return true;
+    } catch (err) {
+        console.error("Error sending Graph email (newJobAlertMailCIR):", err);
+        return false;
+    }
+}
+
+// export async function newJobAlertMailCIR(reciverEmail: string, data: any) {
+
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "New Job Posted in the CIR System - Action Required", // Subject line
+//             text: ``, // plain text body
+//             html: newJobAlertMailTemplateCIR(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+export async function uploadCVAlertMailCIR(reciverEmail: string, data: any): Promise<boolean> {
+    try {
+        const subject = "Confirmation: CVs Successfully Submitted for Active Job.";
+        const htmlBody = uploadCVAlertMailTemplateCIR(data);
+
+        const attachments = data?.url
+            ? [
                 {
                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
                     path: data?.url, // Path to the file
                 },
-            ],
+            ]
+            : [];
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+            attachments,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("Error sending Graph email (uploadCVAlertMailCIR):", err);
         return false;
     }
 }
 
-export async function uploadCVAlertMailCIR(reciverEmail: string, data: any) {
 
+// export async function uploadCVAlertMailCIR(reciverEmail: string, data: any) {
+
+//     try {
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
+//             text: ``, // plain text body
+//             html: uploadCVAlertMailTemplateCIR(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
+
+
+export async function cvRecivedMailCIR(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
-            text: ``, // plain text body
-            html: uploadCVAlertMailTemplateCIR(data), // html body
-            attachments: [
-                {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
-                },
-            ],
+        const subject = "Confirmation: CVs Successfully Submitted for Active Job.";
+        const htmlBody = cvRecivedMailTemplateCIR(data);
+
+        await sendGraphMail({
+            to: [reciverEmail], // or ['ayush@westgateithub.com'] if you want to hardcode
+            subject,
+            htmlBody,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("Error sending Graph email (cvRecivedMailCIR):", err);
         return false;
     }
 }
 
-export async function cvRecivedMailCIR(reciverEmail: string, data: any) {
+// export async function cvRecivedMailCIR(reciverEmail: string, data: any) {
 
+// //     try {
+// //         await transporter.sendMail({
+// //             // from: 'info@saivensolutions.co.uk', // sender address
+// //             from: senderMail,
+// //             // to: reciverEmail, // list of receivers
+// //             to: ['ayush@westgateithub.com'],
+// //             subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
+// //             text: ``, // plain text body
+// //             html: cvRecivedMailTemplateCIR(data), // html body
+// //         });
+
+// //         return true;
+
+// //     } catch (err) {
+// //         console.log(err)
+// //         return false;
+// //     }
+// // }
+
+
+export async function cvReviewMailCIR(reciverEmail: string, data: any): Promise<boolean> {
     try {
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "Confirmation: CVs Successfully Submitted for Active Job.", // Subject line
-            text: ``, // plain text body
-            html: cvRecivedMailTemplateCIR(data), // html body
-        });
+        const subject = "CIR Job Applied - Vetting Process Initiation";
+        const htmlBody = cvReviewMailTemplateCIR(data);
 
-        return true;
-
-    } catch (err) {
-        console.log(err)
-        return false;
-    }
-}
-
-export async function cvReviewMailCIR(reciverEmail: string, data: any) {
-
-    try {
         const attachments = data.cvUploaded.map((attachment: any) => ({
             filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
             path: attachment.url, // Path to the file
         }))
-        await transporter.sendMail({
-            // from: 'info@saivensolutions.co.uk', // sender address
-            from: senderMail,
-            // to: reciverEmail, // list of receivers
-            to: ['ayush@westgateithub.com'],
-            subject: "CIR Job Applied - Vetting Process Initiation", // Subject line
-            text: ``, // plain text body
-            html: cvReviewMailTemplateCIR(data), // html body
-            attachments: [
-                {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
-                },
-                ...attachments
-            ],
+
+
+        const allAttachments = [
+            {
+                filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                path: data?.url, // Path to the file
+            },
+            ...attachments
+        ];
+
+        await sendGraphMailWithAttachment({
+            to: [reciverEmail], // or hardcoded ['ayush@westgateithub.com']
+            subject,
+            htmlBody,
+            attachments: allAttachments,
         });
 
         return true;
-
     } catch (err) {
-        console.log(err)
+        console.error("Error sending Graph email (cvReviewMailCIR):", err);
         return false;
     }
 }
+
+// export async function cvReviewMailCIR(reciverEmail: string, data: any) {
+
+//     try {
+//         const attachments = data.cvUploaded.map((attachment: any) => ({
+//             filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//             path: attachment.url, // Path to the file
+//         }))
+//         await transporter.sendMail({
+//             // from: 'info@saivensolutions.co.uk', // sender address
+//             from: senderMail,
+//             // to: reciverEmail, // list of receivers
+//             to: ['ayush@westgateithub.com'],
+//             subject: "CIR Job Applied - Vetting Process Initiation", // Subject line
+//             text: ``, // plain text body
+//             html: cvReviewMailTemplateCIR(data), // html body
+//             attachments: [
+//                 {
+//                     filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+//                     path: data?.url, // Path to the file
+//                 },
+//                 ...attachments
+//             ],
+//         });
+
+//         return true;
+
+//     } catch (err) {
+//         console.log(err)
+//         return false;
+//     }
+// }
