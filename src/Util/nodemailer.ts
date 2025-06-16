@@ -37,7 +37,8 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
                 contentType: 'HTML',
                 content: htmlBody,
             },
-            toRecipients: recipients,
+            // toRecipients: recipients,
+            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -68,12 +69,14 @@ export async function sendGraphMail(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            toRecipients: options.to.map((email: any) => ({
-                emailAddress: { address: email },
-            })),
-            ccRecipients: (options.cc || []).map((email: any) => ({
-                emailAddress: { address: email },
-            })),
+            // toRecipients: options.to.map((email: any) => ({
+            //     emailAddress: { address: email },
+            // })),
+            // ccRecipients: (options.cc || []).map((email: any) => ({
+            //     emailAddress: { address: email },
+            // })),
+            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            ccRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -97,9 +100,9 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
 
     const attachments = [];
 
-    if (options.attachments?.length) {
-        for (const file of options.attachments) {
-            const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+    if (options?.attachments?.length) {
+        for (const file of options?.attachments) {
+            const response = await axios.get(file?.url, { responseType: 'arraybuffer' });
             const base64Data = Buffer.from(response.data).toString('base64');
 
             attachments.push({
@@ -118,7 +121,8 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            toRecipients,
+            // toRecipients
+            toRecipients : [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             attachments,
             from: {
                 emailAddress: {
@@ -182,7 +186,7 @@ export async function referViaCodeEmailSend(data: any) {
         console.error("Error sending referral email:", err);
         return false;
     }
-}                            
+}
 
 export async function inviteLoginEmailSend(data: any): Promise<boolean> {
     try {
