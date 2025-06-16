@@ -441,7 +441,7 @@ export const getACRUsers = async (req: Request, res: Response) => {
 export const forgotUserPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
-        const user: any = await ACRUserModel.findOne({ email: email.toLowerCase() });
+        const user: any = await userModel.findOne({ email: email.toLowerCase() });
         if (!user) {
             return res.status(404).json({
                 message: "User not found",
@@ -496,7 +496,9 @@ export const resetPassword = async (req: Request, res: Response) => {
         }
 
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY as string) as any;
-        const user = await ACRUserModel.findOne({ email: decodedToken.email.toLowerCase() });
+
+        console.log("decodedToken.email.toLowerCase()", decodedToken.email.toLowerCase())
+        const user = await userModel.findOne({ email: decodedToken.email.toLowerCase() });
 
         if (!user) {
             return res.status(404).json({
