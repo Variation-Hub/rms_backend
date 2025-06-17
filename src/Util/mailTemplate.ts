@@ -499,11 +499,9 @@ export const cvRecivedMailTemplateCIR = (data: any) => {
                 <p><strong>Role Details:</strong></p>
                 <ul>
                     <li><b>Job Role:</b> ${data.role}</li>
-                    <li><b>Client Name:</b> ${data.clientName}</li>
-                    
                 </ul>
                 <p>Thank you for your prompt response and submission of the CVs. Our team will review the CVs and get back to you if any further information or action is needed.</p>
-                <p>FYI: Your new CV has been saved in our system, you can use it when applying for other jobs too.</p>
+               
                 <p>If you have any query, please send them to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
@@ -512,6 +510,8 @@ export const cvRecivedMailTemplateCIR = (data: any) => {
             </div>
         </div>`
 }
+// For cvRecivedMailTemplateCIR
+//  <p> FYI: Your new CV has been saved in our system, you can use it when applying for other jobs too. </p>
 
 export const cvReviewMailTemplateCIR = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">

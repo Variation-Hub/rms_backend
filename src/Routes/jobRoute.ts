@@ -11,7 +11,8 @@ import {
     createJobCIR,
     fetchJobIdCIR,
     getJobsCIR,
-    deleteCIRJob
+    deleteCIRJob,
+    getCIRJobApplication
 } from '../Controllers/jobController';
 import { paginationMiddleware } from '../Middleware/pagination';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -28,6 +29,7 @@ router.get('/jobs', authorizeRoles(), paginationMiddleware, getJobs);
 router.get('/jobs/cir', authorizeRoles(), paginationMiddleware, getJobsCIR);
 
 router.get('/jobs/:id', authorizeRoles(), getJobById);
+router.get('/jobs/cir/:id', authorizeRoles(), getCIRJobApplication);
 
 router.get("/job/fetch/id", authorizeRoles(), fetchJobId)
 router.get("/job/fetch/id/cir", authorizeRoles(), fetchJobIdCIR)

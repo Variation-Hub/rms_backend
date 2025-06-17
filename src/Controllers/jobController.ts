@@ -8,6 +8,7 @@ import ACRUserModel from '../Models/ACRUserModel';
 import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, newJobAlertMailCIR, uploadCVAlertMail } from '../Util/nodemailer';
 import JobModelCIR from '../Models/JobModelCIR';
 import userModel from '../Models/userModel';
+import CandidateJobApplication from '../Models/candicateJobApplication'
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -541,6 +542,80 @@ export const getJobById = async (req: any, res: Response) => {
         });
     }
 };
+
+// Get CIR job application based on the job id 
+export const getCIRJobApplication = async (req: any, res: Response) => {
+    try {
+        const job_id = req.params.id;
+
+        const applied = await CandidateJobApplication.aggregate([
+            {
+                $match: {
+                    job_id: job_id // or { job_id: "JD001" } if job_id is a string
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user_id',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'jobcirs',
+                    localField: 'job_id',
+                    foreignField: 'job_id',
+                    as: 'jobDetails'
+                }
+            },
+            {
+                $unwind: '$jobDetails'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user_id: 1,
+                    job_id: 1,
+                    applied: 1,
+                    status: 1,
+                    cvDetails: 1,
+                    workPreference: 1,
+                    createdAt: 1,
+                    user: 1,
+                    jobDetails: 1
+                }
+            }
+        ]);
+
+
+        if (!applied) {
+            return res.status(404).json({
+                message: "No application found for this job",
+                status: false,
+                data: null
+            });
+        }
+
+        return res.status(200).json({
+            message: "CIR Job applications retrieved successfully",
+            status: true,
+            data: applied
+        });
+
+    } catch (error: any) {
+        console.log("error", error);
+        return res.status(500).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+}
 
 
 // Update a job
