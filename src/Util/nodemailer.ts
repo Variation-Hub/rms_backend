@@ -37,8 +37,8 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
                 contentType: 'HTML',
                 content: htmlBody,
             },
-            // toRecipients: recipients,
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: recipients,
+            // toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -69,14 +69,14 @@ export async function sendGraphMail(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            // toRecipients: options.to.map((email: any) => ({
-            //     emailAddress: { address: email },
-            // })),
-            // ccRecipients: (options.cc || []).map((email: any) => ({
-            //     emailAddress: { address: email },
-            // })),
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
-            ccRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: options.to.map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            ccRecipients: (options.cc || []).map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            // toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            // ccRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -121,8 +121,8 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            // toRecipients
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients,
+            // toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             attachments,
             from: {
                 emailAddress: {
@@ -132,10 +132,14 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
         },
         saveToSentItems: 'false',
     };
+    try {
+        await graphClient
+            .api(`/users/${mail}/sendMail`)
+            .post(message);
+    } catch (error) {
+        console.log("================", error);
+    }
 
-    await graphClient
-        .api(`/users/${mail}/sendMail`)
-        .post(message);
 }
 
 /**
@@ -397,19 +401,20 @@ export async function cvReviewMail(reciverEmail: string, data: any): Promise<boo
     try {
         const attachments: any[] = [
             {
-                filename: data.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
-                url: data.url,
+                name: data?.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
+                url: data?.url,
             },
-            ...data.cvUploaded.map((file: any) => ({
-                filename: file.filename?.substring(file.filename.indexOf('_') + 1) || 'cv',
+            ...data?.cvUploaded?.map((file: any) => ({
+                name: file?.name?.substring(file?.name.indexOf('_') + 1) || 'cv',
                 url: file.url,
             })),
         ];
+        const htmlBody = cvReviewMailTemplate(data);
 
         await sendGraphMailWithAttachment({
             to: ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"],
             subject: "CVs Uploaded - Vetting Process Initiation",
-            htmlBody: cvReviewMailTemplate(data),
+            htmlBody,
             attachments,
         });
 
@@ -516,7 +521,7 @@ export async function newJobAlertMailCIR(reciverEmail: string, data: any): Promi
         const attachments = data?.url
             ? [
                 {
-                    filename: data.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
+                    name: data.filename?.substring(data.filename.indexOf('_') + 1) || 'attachment',
                     url: data.url,
                 }
             ]
@@ -544,8 +549,8 @@ export async function uploadCVAlertMailCIR(reciverEmail: string, data: any): Pro
         const attachments = data?.url
             ? [
                 {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
+                    name: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    url: data?.url, // Path to the file
                 },
             ]
             : [];
@@ -573,8 +578,8 @@ export async function sendMailToCIRAdmins(reciverEmail: string, data: any): Prom
         const attachments = data?.url
             ? [
                 {
-                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                    path: data?.url, // Path to the file
+                    name: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    url: data?.url, // Path to the file
                 },
             ]
             : [];
@@ -617,15 +622,14 @@ export async function cvReviewMailCIR(reciverEmail: string, data: any): Promise<
         const htmlBody = cvReviewMailTemplateCIR(data);
 
         const attachments = data.cvUploaded.map((attachment: any) => ({
-            filename: attachment.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-            path: attachment.url, // Path to the file
+            name: attachment?.filename?.substring(attachment.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+            url: attachment?.url, // Path to the file
         }))
-
 
         const allAttachments = [
             {
-                filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
-                path: data?.url, // Path to the file
+                name: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                url: data?.url, // Path to the file
             },
             ...attachments
         ];

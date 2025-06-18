@@ -267,8 +267,8 @@ export const applyJobRole = async (req: any, res: Response) => {
             cvRecivedMailCIR(user?.email, {
                 name: user?.name,
                 role: job?.job_title,
-                filename: job?.upload?.key,
-                url: job?.upload?.url
+                filename: user?.cv?.name || "",
+                url: user?.cv?.url || ""
             });
             sendMailToCIRAdmins(user?.email, {
                 jobCode: job.job_id,
@@ -276,15 +276,15 @@ export const applyJobRole = async (req: any, res: Response) => {
                 candidateName: user?.name,
                 jobTitle: job?.job_title,
                 appliedDate: new Date(),
-                filename: job?.upload?.key || "",
-                url: job?.upload?.url || ""
+                filename: user?.cv?.name || "",
+                url: user?.cv?.url || ""
             })
         } else {
             uploadCVAlertMailCIR(user?.email, {
                 name: user?.name,
                 role: job?.job_title,
-                filename: job?.upload?.key,
-                url: job?.upload?.url
+                filename: user?.cv?.name || "",
+                url: user?.cv?.url || ""
             });
             sendMailToCIRAdmins(user?.email, {
                 jobCode: job.job_id,
@@ -292,8 +292,8 @@ export const applyJobRole = async (req: any, res: Response) => {
                 candidateName: user?.name,
                 jobTitle: job?.job_title,
                 appliedDate: new Date(),
-                filename: job?.upload?.key || "",
-                url: job?.upload?.url || ""
+                filename: user?.cv?.name || "",
+                url: user?.cv?.url || ""
             })
         }
 
@@ -356,6 +356,9 @@ export const createACRUser = async (req: Request, res: Response) => {
         } else {
 
             const password = generatePassword();
+
+            req.body['contectTime'] = req.body.callTime.map((t: any) => t.label).join(', ');
+
             const newUser = await ACRUserModel.create({ ...req.body, password })
             const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
 
