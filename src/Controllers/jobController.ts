@@ -144,7 +144,7 @@ export const createJobCIR = async (req: Request, res: Response) => {
         allAgengies?.forEach(async (agent: any, index: number) => {
             if (agent?.email) {
                 await delay(index * 1000); // Adding 1-second delay per email
-                const success = await activeCIRRolesPostedMail(agent?.email, { name: agent?.name , job_type : req?.body?.job_type });
+                const success = await activeCIRRolesPostedMail(agent?.email, { name: agent?.name , job_type : req?.body?.job_title });
                 if (!success) {
                     console.log(`Failed to send email to ${agent?.email}`);
                 }

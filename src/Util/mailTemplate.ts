@@ -137,7 +137,7 @@ export const inviteLoginEmail = (data: any) => {
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <p>Dear ${data.candidateName},</p>
             <p>Thank you for registering with Us! We are excited to have you joining our network of professionals.</p>
-            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us and earn through refer a friend.</p>
+            <p>To get started, please log in to your candidate portal, where you can access all the information, update your profile, and explore opportunities in UK Public Sector Contracts with us.</p>
             <p style="font-weight:bold;">Click the link below to log in</p>
             <p style="text-align: center;">
                 <a href="${data.link}" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px;">Login Link</a>
@@ -292,7 +292,6 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                     <li><b>Client Name:</b> ${data.clientName}</li>
                     <li><b>Day Rate:</b> ${data.day_rate}</li>
                     <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
-                    <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
                 </ul>
                 
                 <p> <b>Upload CV(s) Here:</b>
@@ -337,7 +336,7 @@ export const agencyCapacityConfirmationTemplate = (data: {
                 <li><b>Client Name:</b> ${data.clientName}</li>
                 <li><b>Day Rate:</b> £${data.dayRate}</li>
                 <li><b>No. of Positions Confirmed:</b> ${data.positionsConfirmed}</li>
-                <li><b>CV Submission Deadline:</b> ${data.deadline}</li>
+                <li><b>CV Submission Deadline:</b> Within 5 days from confirmation</li>
             </ul>
 
             <p>Please monitor CV uploads and ensure the agency completes the submission within the deadline. If the CVs are not uploaded on time, follow-up action may be required.</p>

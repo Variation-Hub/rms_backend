@@ -276,8 +276,8 @@ export const applyJobRole = async (req: any, res: Response) => {
                 candidateName: user?.name,
                 jobTitle: job?.job_title,
                 appliedDate: new Date(),
-                filename: job?.upload?.key,
-                url: job?.upload?.url
+                filename: job?.upload?.key || "",
+                url: job?.upload?.url || ""
             })
         } else {
             uploadCVAlertMailCIR(user?.email, {
@@ -292,8 +292,8 @@ export const applyJobRole = async (req: any, res: Response) => {
                 candidateName: user?.name,
                 jobTitle: job?.job_title,
                 appliedDate: new Date(),
-                filename: job?.upload?.key,
-                url: job?.upload?.url
+                filename: job?.upload?.key || "",
+                url: job?.upload?.url || ""
             })
         }
 
