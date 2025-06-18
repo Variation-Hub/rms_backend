@@ -5,7 +5,7 @@ import Application from '../Models/applicationModel';
 import Counter from '../Models/JobCounter'
 import CounterCIR from '../Models/JobCountCIR'
 import ACRUserModel from '../Models/ACRUserModel';
-import { activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, newJobAlertMailCIR, uploadCVAlertMail } from '../Util/nodemailer';
+import { activeCIRRolesPostedMail, activeRolesPostedMail, cvRecivedMail, cvReviewMail, InActiveRolesPostedMail, newJobAlertMail, newJobAlertMailCIR, uploadCVAlertMail, uploadCVAlertMailForAdmin } from '../Util/nodemailer';
 import JobModelCIR from '../Models/JobModelCIR';
 import userModel from '../Models/userModel';
 import CandidateJobApplication from '../Models/candicateJobApplication'
@@ -84,7 +84,7 @@ export const createJob = async (req: Request, res: Response) => {
                 }
             });
 
-            process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
+            ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"]?.forEach(async (email, index) => {
                 await delay(index * 1000); // Adding 1-second delay per email
                 const success = await newJobAlertMail(email, {
                     jobTitle: req.body?.job_title,
@@ -144,14 +144,14 @@ export const createJobCIR = async (req: Request, res: Response) => {
         allAgengies?.forEach(async (agent: any, index: number) => {
             if (agent?.email) {
                 await delay(index * 1000); // Adding 1-second delay per email
-                const success = await activeRolesPostedMail(agent?.email, { name: agent?.name });
+                const success = await activeCIRRolesPostedMail(agent?.email, { name: agent?.name , job_type : req?.body?.job_type });
                 if (!success) {
                     console.log(`Failed to send email to ${agent?.email}`);
                 }
             }
         });
 
-        process.env.EMAIL_ARRAY_JOB?.split(" ")?.forEach(async (email, index) => {
+        ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"]?.forEach(async (email, index) => {
             await delay(index * 1000); // Adding 1-second delay per email
             const success = await newJobAlertMailCIR(email, {
                 jobTitle: req.body?.job_title,
@@ -730,6 +730,18 @@ export const applicationJob = async (req: Request, res: Response) => {
             day_rate: job?.day_rate,
             clientName: job?.client_name,
             position: resources,
+            roleType: user?.location,
+            filename: job?.upload?.key,
+            url: job?.upload?.url
+        });
+
+        await uploadCVAlertMailForAdmin(user?.personEmail, {
+            agencyName: user?.agencyName,
+            jobRole: job?.job_title,
+            dayRate: job?.day_rate,
+            clientName: job?.client_name,
+            positionsConfirmed: resources,
+            deadline: String(application?.timer),
             roleType: user?.location,
             filename: job?.upload?.key,
             url: job?.upload?.url

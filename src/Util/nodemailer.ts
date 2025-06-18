@@ -1,5 +1,5 @@
 // import path from "path";
-import { acrPasswordGeneratedMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, adminMailTemplate, adminMailWithPhoneTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
+import { acrPasswordGeneratedMailTemplate, acrUserWelcomeMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, activeRolesPostedMailTemplateCIRAdmin, adminMailTemplate, adminMailWithPhoneTemplate, agencyCapacityConfirmationTemplate, candidateInterestNotificationTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
 const { Client } = require('@microsoft/microsoft-graph-client');
 const { ClientSecretCredential } = require('@azure/identity');
 import axios from 'axios';
@@ -122,7 +122,7 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
                 content: options.htmlBody,
             },
             // toRecipients
-            toRecipients : [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
             attachments,
             from: {
                 emailAddress: {
@@ -253,8 +253,6 @@ export async function activeRolesPostedMail(
     data: any
 ): Promise<boolean> {
     try {
-        console.log("=============== email call ====================");
-
         const subject = "Immediate Action Required: Confirm Capacity for New Active Role(s) within 48 Hours";
         const htmlBody = activeRolesPostedMailTemplate(data);
 
@@ -264,10 +262,28 @@ export async function activeRolesPostedMail(
             htmlBody,
         });
 
-        console.log("=============== email call ==================== done send");
         return true;
     } catch (err) {
-        console.error("=========== send error =========== ", err);
+        return false;
+    }
+}
+
+export async function activeCIRRolesPostedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
+    try {
+        const subject = "Action Required: Review and Respond to New Active Role in CIR Portal";
+        const htmlBody = activeRolesPostedMailTemplateCIRAdmin(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+        });
+
+        return true;
+    } catch (err) {
         return false;
     }
 }
@@ -304,7 +320,7 @@ export async function uploadCVAlertMail(
     data: any
 ): Promise<boolean> {
     try {
-        const subject = "Immediate Action Required: Upload CV(s) for Confirmed Role within 24 Hours";
+        const subject = "Immediate Action Required: Upload CV(s) for Confirmed Role within 5 Days";
         const htmlBody = uploadCVAlertMailTemplate(data);
 
         const attachment = {
@@ -325,6 +341,36 @@ export async function uploadCVAlertMail(
         return false;
     }
 }
+
+export async function uploadCVAlertMailForAdmin(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
+    try {
+        const subject = `Agency Capacity Confirmation – Role: ${data.jobRole}`;
+        const htmlBody = agencyCapacityConfirmationTemplate(data);
+
+        const attachment = {
+            name: data.filename?.substring(data.filename.indexOf('_') + 1) || 'cv-document.pdf',
+            url: data.url,
+        };
+
+        await sendGraphMailWithAttachment({
+            to: ["jamie.thompson@saivensolutions.co.uk",
+                "rmswestgate@gmail.com"
+            ],
+            subject,
+            htmlBody,
+            attachments: [attachment],
+        });
+
+        return true;
+    } catch (err) {
+        console.error('Graph email send error (uploadCVAlertMailForAdmin):', err);
+        return false;
+    }
+}
+
 
 export async function cvRecivedMail(
     reciverEmail: string,
@@ -361,7 +407,7 @@ export async function cvReviewMail(reciverEmail: string, data: any): Promise<boo
         ];
 
         await sendGraphMailWithAttachment({
-            to: [reciverEmail],
+            to: ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"],
             subject: "CVs Uploaded - Vetting Process Initiation",
             htmlBody: cvReviewMailTemplate(data),
             attachments,
@@ -400,6 +446,21 @@ export async function adminMailWithPassword(reciverEmail: string, data: any): Pr
         return true;
     } catch (err) {
         console.error('Graph email send error (adminMailWithPassword):', err);
+        return false;
+    }
+}
+
+export async function acrUserMailTemplateRegister(reciverEmail: string, data: any): Promise<boolean> {
+    try {
+        await sendGraphMail({
+            to: reciverEmail,
+            subject: "Thank You for Registering with SaiVen – Let’s Get Started!",
+            htmlBody: acrUserWelcomeMailTemplate(data),
+        });
+
+        return true;
+    } catch (err) {
+        console.error('Graph email send error (acrUserMailTemplateRegister):', err);
         return false;
     }
 }
@@ -491,6 +552,35 @@ export async function uploadCVAlertMailCIR(reciverEmail: string, data: any): Pro
 
         await sendGraphMailWithAttachment({
             to: [reciverEmail],
+            subject,
+            htmlBody,
+            attachments,
+        });
+
+        return true;
+    } catch (err) {
+        console.error("Error sending Graph email (uploadCVAlertMailCIR):", err);
+        return false;
+    }
+}
+
+
+export async function sendMailToCIRAdmins(reciverEmail: string, data: any): Promise<boolean> {
+    try {
+        const subject = "CIR Job Applied - Vetting Process Initiation";
+        const htmlBody = candidateInterestNotificationTemplate(data);
+
+        const attachments = data?.url
+            ? [
+                {
+                    filename: data?.filename?.substring(data.filename.indexOf('_') + 1) || "",            // Name of the file to attach
+                    path: data?.url, // Path to the file
+                },
+            ]
+            : [];
+
+        await sendGraphMailWithAttachment({
+            to: ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"],
             subject,
             htmlBody,
             attachments,

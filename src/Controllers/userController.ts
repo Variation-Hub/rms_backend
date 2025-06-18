@@ -6,7 +6,7 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrPasswordGeneratedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, uploadCVAlertMailCIR } from "../Util/nodemailer"
+import { acrPasswordGeneratedMail, acrUserMailTemplateRegister, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
@@ -269,11 +269,29 @@ export const applyJobRole = async (req: any, res: Response) => {
                 role: job?.job_title,
                 filename: job?.upload?.key,
                 url: job?.upload?.url
+            });
+            sendMailToCIRAdmins(user?.email, {
+                jobCode: job.job_id,
+                clientName: job?.client_name,
+                candidateName: user?.name,
+                jobTitle: job?.job_title,
+                appliedDate: new Date(),
+                filename: job?.upload?.key,
+                url: job?.upload?.url
             })
         } else {
             uploadCVAlertMailCIR(user?.email, {
                 name: user?.name,
                 role: job?.job_title,
+                filename: job?.upload?.key,
+                url: job?.upload?.url
+            });
+            sendMailToCIRAdmins(user?.email, {
+                jobCode: job.job_id,
+                clientName: job?.client_name,
+                candidateName: user?.name,
+                jobTitle: job?.job_title,
+                appliedDate: new Date(),
                 filename: job?.upload?.key,
                 url: job?.upload?.url
             })
@@ -340,7 +358,11 @@ export const createACRUser = async (req: Request, res: Response) => {
             const password = generatePassword();
             const newUser = await ACRUserModel.create({ ...req.body, password })
             const token = generateToken({ _id: newUser._id, email: newUser.personEmail, name: newUser.personName })
+
+            await acrUserMailTemplateRegister(newUser.personEmail, { userName: newUser.personName });
+
             adminMailWithPassword(process.env.EMAIL_PASSWORD!, { agencyName: newUser?.agencyName, name: newUser.personName, email: newUser.personEmail, phone: newUser?.phoneNumber, password })
+
             return res.status(200).json({
                 message: "ACR User registration success",
                 status: true,

@@ -196,7 +196,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
                 <p>We have just posted new active roles in our Agency Capacity Record System, and your prompt response is required.</p>
-                <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within <b>2 hours</b>. Additionally, please upload the CVs within 24 hours of confirming.</p>
+                <p>Please log in to the system and review the roles under your agency's account. It is essential to mark "Yes" or "No" and confirm your capacity for each role within <b>48 hours</b>. Additionally, please upload the CVs within 5 days of confirming.</p>
                 <p>Access the System Here:
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
@@ -213,6 +213,36 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                 <p>Please note that if you do not respond within the given timeframe, your ability to supply candidates for these roles will be impacted.</p>
                 <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
                 <p>Thank you for your immediate attention.</p>
+                <div style="margin-top: 20px;">
+                    <p>Best regards,<br>
+                    SaiVen Technology Solutions Limited</p>
+                </div>
+            </div>
+        </div>`
+}
+
+export const activeRolesPostedMailTemplateCIRAdmin = (data: any) => {
+
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                <p>Dear <b>${data?.name},</b></p>
+                <p>We have recently posted new active role ${data?.job_type} in our CIR Portal, and your prompt response is required.</p>
+                <p>Please log in to your CIR account to review this role and all the available roles. It is important that you indicate your interest by applying for any preferred role before the listed job expiry date.</p>
+                <p>Access the CIR Portal:
+                <a href="https://rms.saivensolutions.co.uk/#/cir/cir-login" style="display: inline-block; font-weight: bold;">Login to CIR</a>
+                </p>
+                <p>Please follow these steps to confirm your interest: </p>
+                <ol>
+                    <li>Log in to the system.</li>
+                    <li>Navigate to the "All Roles" section.</li>
+                    <li>Download and review the ReadMe document for the role.</li>
+                    <li>Click on the “Apply” button for the role you wish to pursue.</li>
+                    <li>Use your existing CV or upload an updated version, and specify your preferred work location for that role.</li>
+                    <li> Submit your application..</li>
+                </ol>
+                <p>Important: Roles are only valid until the posted expiry date. Kindly ensure your response is submitted within this timeframe.</p>
+                <p>If you have any questions or need assistance, please feel free to reach out to <br/><a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+                <p>Thank you for your prompt attention to this matter.</p>
                 <div style="margin-top: 20px;">
                     <p>Best regards,<br>
                     SaiVen Technology Solutions Limited</p>
@@ -254,7 +284,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
             <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 <p>Dear <b>${data.name},</b></p>
                 <p>Thank you for confirming your capacity to supply candidates for the role of <b>${data.role}</b> in our Agency Capacity Record System.</p>
-                <p>As a next step, please <b>upload the CV(s)</b> of the candidates you have confirmed for this role within <b>24 hours</b> of your confirmation through our portal.</p>
+                <p>As a next step, please <b>upload the CV(s)</b> of the candidates you have confirmed for this role within <b>5 days</b> of your confirmation through our portal.</p>
                 
                 <p><strong>Role Details:</strong></p>
                 <ul>
@@ -262,7 +292,7 @@ export const uploadCVAlertMailTemplate = (data: any) => {
                     <li><b>Client Name:</b> ${data.clientName}</li>
                     <li><b>Day Rate:</b> ${data.day_rate}</li>
                     <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
-                    
+                    <li><b>No. of Positions you confirmed:</b> ${data.position}</li>
                 </ul>
                 
                 <p> <b>Upload CV(s) Here:</b>
@@ -286,6 +316,40 @@ export const uploadCVAlertMailTemplate = (data: any) => {
             </div>
         </div>`
 }
+
+export const agencyCapacityConfirmationTemplate = (data: {
+    agencyName: string;
+    jobRole: string;
+    clientName: string;
+    dayRate: string;
+    positionsConfirmed: number;
+    deadline: string;
+}) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p>Dear Admin,</p>
+
+            <p>This is to inform you that <b>${data.agencyName}</b> has confirmed their capacity to supply candidates for the below role in our Agency Capacity Record System:</p>
+
+            <h4 style="margin-top: 20px;">Role Details:</h4>
+            <ul>
+                <li><b>Job Role:</b> ${data.jobRole}</li>
+                <li><b>Client Name:</b> ${data.clientName}</li>
+                <li><b>Day Rate:</b> £${data.dayRate}</li>
+                <li><b>No. of Positions Confirmed:</b> ${data.positionsConfirmed}</li>
+                <li><b>CV Submission Deadline:</b> ${data.deadline}</li>
+            </ul>
+
+            <p>Please monitor CV uploads and ensure the agency completes the submission within the deadline. If the CVs are not uploaded on time, follow-up action may be required.</p>
+
+            <div style="margin-top: 20px;">
+                <p>Best regards,<br/>
+                <b>SaiVen Technology Solutions Limited</b></p>
+            </div>
+        </div>
+    </div>`;
+};
+
 
 export const cvRecivedMailTemplate = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
@@ -388,6 +452,36 @@ export const adminMailWithPhoneTemplate = (data: any) => {
         </div>`
 }
 
+export const acrUserWelcomeMailTemplate = (data: { userName: string; }) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p>Dear ${data.userName},</p>
+            <p>Thank you for registering with <b>SaiVen Technology Solutions</b>. We’re delighted to welcome you to our network of professionals supporting UK Public Sector contracts.</p>
+
+            <p>To get started, please log in to your Agency Portal. For your initial login credentials, kindly contact me at <a href="mailto:jamie.thompson@saivensolutions.co.uk">jamie.thompson@saivensolutions.co.uk</a>.</p>
+
+            <p>Once you receive your temporary password, please reset it immediately for security purposes.</p>
+
+            <p>You can then update your profile, access key information, and explore exciting opportunities.</p>
+
+            <p><a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; background-color: #007bff; color: #fff; padding: 10px 15px; border-radius: 4px; text-decoration: none;">Login Link</a></p>
+
+            <p>If you have any questions or require support, please don’t hesitate to get in touch.</p>
+
+            <p>We look forward to a successful partnership.</p>
+
+            <div style="margin-top: 20px;">
+                <p>Best regards,</p>
+                <p><b>Jamie Thompson</b><br/>
+                Recruitment Lead<br/>
+                SaiVen Technology Solutions Limited<br/>
+                <a href="mailto:jamie.thompson@saivensolutions.co.uk">jamie.thompson@saivensolutions.co.uk</a></p>
+            </div>
+        </div>
+    </div>`;
+};
+
+
 export const InActiveRolesPostedMailTemplate = (data: any) => {
 
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
@@ -489,6 +583,38 @@ export const uploadCVAlertMailTemplateCIR = (data: any) => {
             </div>
         </div>`
 }
+
+export const candidateInterestNotificationTemplate = (data: {
+    jobCode: string;
+    jobTitle: string;
+    clientName: string;
+    candidateName: string;
+    appliedDate: string;
+}) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p>Dear HR Team,</p>
+
+            <p>We have received interest from a candidate on <b>CIR</b> for the recently posted role of <b>${data.jobTitle}</b>. Please find the confirmation below:</p>
+
+            <h4 style="margin-top: 20px;">Candidate Application Details:</h4>
+            <ul>
+                <li><b>Job Code:</b> ${data.jobCode}</li>
+                <li><b>Job Title:</b> ${data.jobTitle}</li>
+                <li><b>Client Name:</b> ${data.clientName}</li>
+                <li><b>Applied By:</b> ${data.candidateName}</li>
+                <li><b>Applied Date:</b> ${data.appliedDate}</li>
+            </ul>
+
+            <p>The vetting process will now be initiated by our <b>Management Consultant (MC)</b> team. Please ensure all necessary steps are followed.</p>
+
+            <div style="margin-top: 20px;">
+                <p>Best regards,<br/>
+                <b>SaiVen Technology Solutions Limited</b></p>
+            </div>
+        </div>
+    </div>`;
+};
 
 export const cvRecivedMailTemplateCIR = (data: any) => {
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
