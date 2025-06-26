@@ -15,7 +15,9 @@ import {
     createAdmin,
     loginAdmin,
     forgotACRUserPassword,
-    applyJobRole
+    applyJobRole,
+    getACRUsersWithApplicant,
+    sendAcrJobApplicationMail
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -39,6 +41,8 @@ userRoutes.patch("/acr/update", authorizeRoles(), updateACRUser);
 userRoutes.post("/acr/reset", authorizeRoles(), resetacrPassword)
 userRoutes.get("/acr/list", paginationMiddleware, authorizeRoles(), getACRUsers)
 userRoutes.post("/acr/forgot", forgotACRUserPassword)
+userRoutes.post("/acr/user-with-applicant", paginationMiddleware, authorizeRoles(), getACRUsersWithApplicant);
+userRoutes.post("/acr/send-mail", authorizeRoles(), sendAcrJobApplicationMail)
 
 //Admin routes
 userRoutes.post("/admin/register", createAdmin);

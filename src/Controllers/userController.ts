@@ -463,6 +463,86 @@ export const getACRUsers = async (req: Request, res: Response) => {
     }
 }
 
+export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
+    try {
+        const { page, limit, skip } = req.pagination!;
+        const { job_id } = req.body;
+
+        const totalCount = await ACRUserModel.countDocuments();
+
+        const users = await ACRUserModel.aggregate([
+            { $sort: { createdAt: -1 } },
+            // { $skip: skip },
+            // { $limit: limit },
+            {
+                $lookup: {
+                    from: "jobapplications", // Make sure this matches the actual collection name
+                    let: { userId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$user_id", "$$userId"] },
+                                        ...(job_id ? [{ $eq: ["$job_id", job_id] }] : [])
+                                    ]
+                                }
+                            }
+                        },
+                        { $limit: 1 }
+                    ],
+                    as: "jobApplication"
+                }
+            },
+            {
+                $addFields: {
+                    jobApplication: { $arrayElemAt: ["$jobApplication", 0] } // Return single object or null
+                }
+            }
+        ]);
+
+        // const users = await ACRUserModel.find(query)
+        //     .skip(skip)
+        //     .limit(limit)
+        //     .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            message: "ACR Users fetch successfully",
+            status: true,
+            data: users,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / (limit as number))
+            }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+export const sendAcrJobApplicationMail = async (req: Request, res: Response) => {
+    try {
+        const { emails, job_id } = req.body;
+        return res.status(200).json({
+            message: "Send mail successfully",
+            status: true,
+            data: emails
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
 export const forgotUserPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;

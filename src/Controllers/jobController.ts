@@ -784,9 +784,13 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
             });
             return;
         }
+        if(application?.cvDetails?.length > 0) {
+            application?.cvDetails?.push(cvDetails);
+        } else {
+            application.cvDetails = cvDetails;
+        }
 
-        application.cvDetails = cvDetails;
-        application.status = application?.no_of_resouces === application?.cvDetails.length ? "Under Review" : "Partially Uploaded";
+        application.status = application?.no_of_resouces <= application?.cvDetails.length ? "Under Review" : "Partially Uploaded";
         await application.save();
 
         if (application?.no_of_resouces === application?.cvDetails.length) {
