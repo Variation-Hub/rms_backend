@@ -1,4 +1,4 @@
-import e, { Request, response, Response } from "express"
+import { Request, Response } from "express"
 import userModel from "../Models/userModel"
 import referAndEarnModel from '../Models/referModel'
 import { generateToken } from "../Util/JwtAuth"
@@ -6,14 +6,14 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrPasswordGeneratedMail, acrUserMailTemplateRegister, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
+import { acrUserMailTemplateRegister, activeRolesPostedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
 import { generatePassword } from "../Util/passwordGenarator"
-import JobModel from "../Models/JobModel"
 import JobModelCIR from "../Models/JobModelCIR"
 const { Parser } = require('json2csv');
+import Job from '../Models/JobModel';
 
 const url = 'https://rms.saivensolutions.co.uk';
 // const url = 'https://rms.whyqtech.com';
@@ -528,11 +528,37 @@ export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
 
 export const sendAcrJobApplicationMail = async (req: Request, res: Response) => {
     try {
-        const { emails, job_id } = req.body;
+        const { emails, jobId, mailType, date } = req.body;
+
+        const jobDetails = await Job.findOne({ job_id: jobId });
+
+        function delay(ms: number) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        emails?.forEach(async (email: any, index: number) => {
+            const agency: any = await ACRUserModel.findOne({ personEmail: email });
+            if (email) {
+                await delay(index * 1000); // Adding 1-second delay per email
+                if (mailType == 'new') {
+                    const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
+                    if (!success) {
+                        console.log(`Failed to send email to ${email}`);
+                    }
+                }
+                if (mailType == 'reminder') {
+                    const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
+                    if (!success) {
+                        console.log(`Failed to send email to ${email}`);
+                    }
+                }
+            }
+        });
+
         return res.status(200).json({
             message: "Send mail successfully",
             status: true,
-            data: emails
+            data: { emails, jobDetails }
         });
     } catch (err: any) {
         return res.status(500).json({
