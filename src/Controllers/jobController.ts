@@ -9,6 +9,7 @@ import { activeCIRRolesPostedMail, activeRolesPostedMail, cvRecivedMail, cvRevie
 import JobModelCIR from '../Models/JobModelCIR';
 import userModel from '../Models/userModel';
 import CandidateJobApplication from '../Models/candicateJobApplication'
+import ACRExtendJob from '../Models/acrextendJobModel';
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -183,10 +184,7 @@ export const createJobCIR = async (req: Request, res: Response) => {
 // Get all jobs
 export const getJobs = async (req: any, res: Response) => {
     try {
-        console.log("============")
         const { page, limit, skip } = req.pagination!;
-
-        console.log("page, limit, skip", page, limit, skip)
         const { keyword, status } = req.query;
         const userId = req?.user?._id || "671218f1d697fbd930d2d3ff";
 
@@ -299,7 +297,8 @@ export const getJobs = async (req: any, res: Response) => {
         ]);
 
         // Process the aggregated results with user-specific calculations
-        let jobsWithProcessedData = enrichedData.map((job: any) => {
+        // and bind extended job details for each job
+        let jobsWithProcessedData = await Promise.all(enrichedData.map(async (job: any) => {
             const now = new Date();
             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
 
@@ -318,6 +317,12 @@ export const getJobs = async (req: any, res: Response) => {
                 };
             }
 
+            // Fetch extended job details for this job and user
+            const extendedJobDetails = await ACRExtendJob.findOne({
+                job_id: job.job_id,
+                user_id: userId
+            });
+
             return {
                 _id: job._id,
                 job_id: job.job_id,
@@ -335,9 +340,10 @@ export const getJobs = async (req: any, res: Response) => {
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
                 status: job.dynamicStatus,
                 ...processedApplicantInfo,
+                extendedJobDetails, // <-- Binds the extension info here
                 // createAt: job.createAt,
             };
-        });
+        }));
 
         return res.status(200).json({
             message: "Jobs retrieved successfully",
@@ -358,6 +364,182 @@ export const getJobs = async (req: any, res: Response) => {
         });
     }
 };
+
+// Get all jobs
+// export const getJobs = async (req: any, res: Response) => {
+//     try {
+//         const { page, limit, skip } = req.pagination!;
+//         const { keyword, status } = req.query;
+//         const userId = req?.user?._id || "671218f1d697fbd930d2d3ff";
+
+//         let query: any = {};
+//         if (keyword) {
+//             query.job_title = { $regex: keyword, $options: 'i' };
+//         }
+
+//         // First get the base jobs with pagination
+//         const basePipeline: any = [
+//             { $match: query },
+//             {
+//                 $addFields: {
+//                     jobTimeLeft: {
+//                         $subtract: [new Date(), "$timerEnd"]
+//                     },
+//                     dynamicStatus: {
+//                         $cond: [
+//                             { $eq: ["$status", "Inactive"] },
+//                             "Inactive",
+//                             {
+//                                 $cond: [
+//                                     { $lt: [new Date(), "$timerEnd"] },
+//                                     "Active",
+//                                     "Expired"
+//                                 ]
+//                             }
+//                         ]
+//                     }
+//                 }
+//             },
+//             ...(status ? [{ $match: { dynamicStatus: status } }] : []),
+//             {
+//                 $addFields: {
+//                     sortStatus: {
+//                         $cond: [
+//                             { $eq: ["$dynamicStatus", "Active"] },
+//                             0,
+//                             {
+//                                 $cond: [
+//                                     { $eq: ["$dynamicStatus", "Inactive"] },
+//                                     2,
+//                                     1
+//                                 ]
+//                             }
+//                         ]
+//                     }
+//                 }
+//             },
+//             { $sort: { sortStatus: 1, createAt: -1 } }
+//         ];
+
+//         // Get total count
+//         const totalCountData = await Job.aggregate(basePipeline);
+//         let totalCount = totalCountData.length;
+
+//         // Get paginated base data
+//         const paginatedBaseData = await Job.aggregate([
+//             ...basePipeline,
+//             { $skip: skip },
+//             { $limit: limit }
+//         ]);
+
+//         // Now enrich the paginated data with applicants info
+//         const enrichedData = await Job.aggregate([
+//             { $match: { _id: { $in: paginatedBaseData.map(job => job._id) } } },
+//             {
+//                 $lookup: {
+//                     from: 'jobapplications',
+//                     localField: 'applicants',
+//                     foreignField: '_id',
+//                     as: 'applicantsInfo'
+//                 }
+//             },
+//             {
+//                 $unwind: {
+//                     path: '$applicantsInfo',
+//                     preserveNullAndEmptyArrays: true
+//                 }
+//             },
+//             {
+//                 $lookup: {
+//                     from: 'acrusers',
+//                     localField: 'applicantsInfo.user_id',
+//                     foreignField: '_id',
+//                     as: 'applicantsInfo.userInfo'
+//                 }
+//             },
+//             {
+//                 $unwind: {
+//                     path: '$applicantsInfo.userInfo',
+//                     preserveNullAndEmptyArrays: true
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: '$_id',
+//                     applicantsInfo: { $push: '$applicantsInfo' },
+//                     otherFields: { $first: '$$ROOT' }
+//                 }
+//             },
+//             {
+//                 $replaceRoot: {
+//                     newRoot: {
+//                         $mergeObjects: ['$otherFields', { applicantsInfo: '$applicantsInfo' }]
+//                     }
+//                 }
+//             },
+//             { $sort: { sortStatus: 1, createAt: -1 } }
+//         ]);
+
+//         // Process the aggregated results with user-specific calculations
+//         let jobsWithProcessedData = enrichedData.map((job: any) => {
+//             const now = new Date();
+//             const jobTimeLeft = Math.max(new Date(job.timerEnd).getTime() - now.getTime(), 0);
+
+//             const matchingApplicant = job.applicantsInfo.find((applicant: any) => applicant?.user_id?.toString() === userId?.toString());
+
+//             let processedApplicantInfo: any = {};
+//             if (matchingApplicant) {
+//                 const cvTimeLeft = Math.max(new Date(matchingApplicant.timer).getTime() - now.getTime(), 0);
+//                 processedApplicantInfo = {
+//                     status: matchingApplicant.status,
+//                     no_of_resouces: matchingApplicant.no_of_resouces,
+//                     cvDetails: matchingApplicant.cvDetails,
+//                     cv_timer_end: matchingApplicant.timer,
+//                     applied: matchingApplicant.applied,
+//                     cv_time_left: matchingApplicant.status === "Under Review" ? 0 : cvTimeLeft
+//                 };
+//             }
+
+//             return {
+//                 _id: job._id,
+//                 job_id: job.job_id,
+//                 job_title: job.job_title,
+//                 no_of_roles: job.no_of_roles,
+//                 start_date: job.start_date,
+//                 publish_date: job.publish_date,
+//                 client_name: job.client_name,
+//                 location: job.location,
+//                 day_rate: job.day_rate,
+//                 applicants: job.applicantsInfo,
+//                 upload: job.upload,
+//                 timerEnd: job.timerEnd,
+//                 jobExpireDate: job?.jobExpireDate,
+//                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
+//                 status: job.dynamicStatus,
+//                 ...processedApplicantInfo,
+//                 // createAt: job.createAt,
+//             };
+//         });
+
+//         return res.status(200).json({
+//             message: "Jobs retrieved successfully",
+//             status: true,
+//             data: jobsWithProcessedData,
+//             meta_data: {
+//                 page,
+//                 items: totalCount,
+//                 page_size: limit,
+//                 pages: Math.ceil(totalCount / limit)
+//             }
+//         });
+//     } catch (error: any) {
+//         return res.status(500).json({
+//             message: error.message,
+//             status: false,
+//             data: null
+//         });
+//     }
+// };
 
 // Get all jobs CIR
 export const getJobsCIR = async (req: any, res: Response) => {

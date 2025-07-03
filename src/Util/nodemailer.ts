@@ -37,8 +37,8 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
                 contentType: 'HTML',
                 content: htmlBody,
             },
-            // toRecipients: recipients,
-            toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
+            toRecipients: recipients,
+            // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -69,14 +69,14 @@ export async function sendGraphMail(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            // toRecipients: options.to.map((email: any) => ({
-            //     emailAddress: { address: email },
-            // })),
-            // ccRecipients: (options.cc || []).map((email: any) => ({
-            //     emailAddress: { address: email },
-            // })),
-            toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
-            ccRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
+            toRecipients: options.to.map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            ccRecipients: (options.cc || []).map((email: any) => ({
+                emailAddress: { address: email },
+            })),
+            // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
+            // ccRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -121,8 +121,8 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
                 contentType: 'HTML',
                 content: options.htmlBody,
             },
-            // toRecipients,
-            toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
+            toRecipients,
+            // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
             attachments,
             from: {
                 emailAddress: {

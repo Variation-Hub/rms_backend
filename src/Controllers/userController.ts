@@ -14,6 +14,7 @@ import { generatePassword } from "../Util/passwordGenarator"
 import JobModelCIR from "../Models/JobModelCIR"
 const { Parser } = require('json2csv');
 import Job from '../Models/JobModel';
+import ACRExtendJob from '../Models/acrextendJobModel';
 
 const url = 'https://rms.saivensolutions.co.uk';
 // const url = 'https://rms.whyqtech.com';
@@ -463,6 +464,65 @@ export const getACRUsers = async (req: Request, res: Response) => {
     }
 }
 
+export const getCIRUsersWithApplicant = async (req: Request, res: Response) => {
+    try {
+        const { page, limit, skip } = req.pagination!;
+        const { job_id } = req.body;
+
+        const totalCount = await userModel.countDocuments();
+
+        const users = await userModel.aggregate([
+            { $sort: { createdAt: -1 } },
+            // { $skip: skip },
+            // { $limit: limit },
+            {
+                $lookup: {
+                    from: "candidatejobapplications", // Make sure this matches the actual collection name
+                    let: { userId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$user_id", "$$userId"] },
+                                        ...(job_id ? [{ $eq: ["$job_id", job_id] }] : [])
+                                    ]
+                                }
+                            }
+                        },
+                        { $limit: 1 }
+                    ],
+                    as: "jobApplication"
+                }
+            },
+            {
+                $addFields: {
+                    jobApplication: { $arrayElemAt: ["$jobApplication", 0] } // Return single object or null
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            message: "CIR Users fetch successfully",
+            status: true,
+            data: users,
+            meta_data: {
+                page,
+                items: totalCount,
+                page_size: limit,
+                pages: Math.ceil(totalCount / (limit as number))
+            }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
+
+
 export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
@@ -501,11 +561,6 @@ export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
             }
         ]);
 
-        // const users = await ACRUserModel.find(query)
-        //     .skip(skip)
-        //     .limit(limit)
-        //     .sort({ createdAt: -1 });
-
         return res.status(200).json({
             message: "ACR Users fetch successfully",
             status: true,
@@ -526,7 +581,7 @@ export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
     }
 }
 
-export const sendAcrJobApplicationMail = async (req: Request, res: Response) => {
+export const sendAcrJobApplicationMail = async (req: Request | any, res: Response) => {
     try {
         const { emails, jobId, mailType, date } = req.body;
 
@@ -538,6 +593,15 @@ export const sendAcrJobApplicationMail = async (req: Request, res: Response) => 
 
         emails?.forEach(async (email: any, index: number) => {
             const agency: any = await ACRUserModel.findOne({ personEmail: email });
+
+            await ACRExtendJob.create({
+                user_id: agency._id,
+                job_id: jobId,
+                extended_by: agency._id, // if you track who did the extension
+                job_expire_date: date,
+                reason: "Manual extension by admin"
+            });
+
             if (email) {
                 await delay(index * 1000); // Adding 1-second delay per email
                 if (mailType == 'new') {
@@ -546,6 +610,7 @@ export const sendAcrJobApplicationMail = async (req: Request, res: Response) => 
                         console.log(`Failed to send email to ${email}`);
                     }
                 }
+
                 if (mailType == 'reminder') {
                     const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
                     if (!success) {
