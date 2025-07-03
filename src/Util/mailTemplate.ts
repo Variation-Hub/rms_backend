@@ -200,7 +200,7 @@ export const activeRolesPostedMailTemplate = (data: any) => {
                 <p>Access the System Here:
                 <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
                 </p>
-                <p><strong>Important:</strong> The posted jobs will only be valid for 2 hours, so please respond within this timeframe.</p>
+                <p><strong>Important:</strong> The posted jobs will only be valid for 48 hours, so please respond within this timeframe.</p>
                 <p><strong>Steps to Confirm:</strong></p>
                 <ol>
                     <li>Log in to the system.</li>
@@ -220,6 +220,37 @@ export const activeRolesPostedMailTemplate = (data: any) => {
             </div>
         </div>`
 }
+
+export const missedACRRoleReapplyMailTemplate = (data: { agencyName: string, roleName: string, expiryDate: string }) => {
+    return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p>Dear <b>${data.agencyName},</b></p>
+            <p>We noticed that you did not confirm your capacity or upload candidate CVs for the recently posted role <strong>“${data.roleName}”</strong> within the specified timeframe in the Agency Capacity Record System.</p>
+            <p>To support you in continuing to participate in this opportunity, we are extending a one-time option for your agency to reapply for the missed role(s), which will be active until <b>${data.expiryDate}</b>.</p>
+            <p><strong>What You Need to Do:</strong></p>
+            <ol>
+                <li>Log in to the Agency Capacity Record System.</li>
+                <li>Navigate to the "All Roles" section.</li>
+                <li>Locate the relevant role(s).</li>
+                <li>Mark "Yes" or "No" for each role.</li>
+                <li>Confirm the number of candidates you can supply.</li>
+                <li>Upload CVs within 5 days of reapplying.</li>
+            </ol>
+            <p>Access the System Here: 
+            <a href="https://rms.saivensolutions.co.uk/#/acr/acr-login" style="display: inline-block; font-weight: bold;">Login to Agency Capacity Record System</a>
+            </p>
+            <p><strong>Please note:</strong> This reapply option is only available until <b>${data.expiryDate}</b> and may not be offered again for future missed deadlines. Ensure all actions are completed within the extended window to avoid impact on future submissions.</p>
+            <p>If you have any questions or require assistance, feel free to contact<br/>
+            <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration:none; font-weight:bold; color:skyblue;">jamie.thompson@saivensolutions.co.uk</a></p>
+            <p>Thank you for your continued partnership.</p>
+            <div style="margin-top: 20px;">
+                <p>Best regards,<br>
+                SaiVen Technology Solutions Limited</p>
+            </div>
+        </div>
+    </div>`;
+};
+
 
 export const activeRolesPostedMailTemplateCIRAdmin = (data: any) => {
 

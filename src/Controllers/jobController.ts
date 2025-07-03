@@ -10,6 +10,7 @@ import JobModelCIR from '../Models/JobModelCIR';
 import userModel from '../Models/userModel';
 import CandidateJobApplication from '../Models/candicateJobApplication'
 import ACRExtendJob from '../Models/acrextendJobModel';
+import CIRExtendJob from '../Models/CirExtendJobModel';
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -145,7 +146,7 @@ export const createJobCIR = async (req: Request, res: Response) => {
         allAgengies?.forEach(async (agent: any, index: number) => {
             if (agent?.email) {
                 await delay(index * 1000); // Adding 1-second delay per email
-                const success = await activeCIRRolesPostedMail(agent?.email, { name: agent?.name , job_type : req?.body?.job_title });
+                const success = await activeCIRRolesPostedMail(agent?.email, { name: agent?.name, job_type: req?.body?.job_title });
                 if (!success) {
                     console.log(`Failed to send email to ${agent?.email}`);
                 }
@@ -578,16 +579,32 @@ export const getJobsCIR = async (req: any, res: Response) => {
             }
         ]).skip(skip).limit(limit);
 
-        let jobsWithProcessedData = jobs.map((job: any) => {
-
+        // Bind cirextendJobDetails for each job
+        let jobsWithProcessedData = await Promise.all(jobs.map(async (job: any) => {
             const matchingApplicant = job.candidateApplications.find((applicant: any) => applicant.user_id.toString() === user_id.toString());
+
+            // Fetch cirextendJobDetails for this job and user
+            const cirextendJobDetails = await CIRExtendJob.findOne({
+                job_id: job.job_id,
+                user_id: user_id
+            });
+
+            job['cirextendJobDetails'] = cirextendJobDetails || null;
 
             if (matchingApplicant) {
                 job.status = "Applied"
             }
 
-            if (job.jobExpireDate < new Date()) {
-                job.status = "Expired";
+            if (job?.cirextendJobDetails?.job_expire_date) {
+                if (job?.cirextendJobDetails?.job_expire_date < new Date()) {
+                    job.status = "Expired";
+                }
+                console.log("test")
+            } else {
+                if (job.jobExpireDate < new Date()) {
+                    job.status = "Expired";
+                }
+                console.log("test22")
             }
 
             return {
@@ -604,9 +621,10 @@ export const getJobsCIR = async (req: any, res: Response) => {
                 client_name: job.client_name,
                 location: job.location,
                 day_rate: job.day_rate,
+                cirextendJobDetails, // <-- Binds the extension info here
                 // candidateDetails: matchingApplicant
             };
-        });
+        }));
 
         return res.json({
             message: "Fetched jobs successfully",
@@ -966,7 +984,7 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
             });
             return;
         }
-        if(application?.cvDetails?.length > 0) {
+        if (application?.cvDetails?.length > 0) {
             application?.cvDetails?.push(cvDetails);
         } else {
             application.cvDetails = cvDetails;

@@ -1,5 +1,5 @@
 // import path from "path";
-import { acrPasswordGeneratedMailTemplate, acrUserWelcomeMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, activeRolesPostedMailTemplateCIRAdmin, adminMailTemplate, adminMailWithPhoneTemplate, agencyCapacityConfirmationTemplate, candidateInterestNotificationTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
+import { acrPasswordGeneratedMailTemplate, acrUserWelcomeMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, activeRolesPostedMailTemplateCIRAdmin, adminMailTemplate, adminMailWithPhoneTemplate, agencyCapacityConfirmationTemplate, candidateInterestNotificationTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, missedACRRoleReapplyMailTemplate, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
 const { Client } = require('@microsoft/microsoft-graph-client');
 const { ClientSecretCredential } = require('@azure/identity');
 import axios from 'axios';
@@ -259,6 +259,26 @@ export async function activeRolesPostedMail(
     try {
         const subject = "Immediate Action Required: Confirm Capacity for New Active Role(s) within 48 Hours";
         const htmlBody = activeRolesPostedMailTemplate(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+        });
+
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+export async function RemainderActiveRolesPostedMailForACR(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
+    try {
+        const subject = "Reapply Opportunity for Recent Role “Role Name” in Agency Capacity Record System";
+        const htmlBody = missedACRRoleReapplyMailTemplate(data);
 
         await sendGraphMail({
             to: [reciverEmail],

@@ -6,7 +6,7 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrUserMailTemplateRegister, activeRolesPostedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
+import { acrUserMailTemplateRegister, activeCIRRolesPostedMail, activeRolesPostedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, RemainderActiveRolesPostedMailForACR, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
@@ -15,6 +15,8 @@ import JobModelCIR from "../Models/JobModelCIR"
 const { Parser } = require('json2csv');
 import Job from '../Models/JobModel';
 import ACRExtendJob from '../Models/acrextendJobModel';
+import JobCIR from '../Models/JobModelCIR';
+import CIRExtendJob from '../Models/CirExtendJobModel';
 
 const url = 'https://rms.saivensolutions.co.uk';
 // const url = 'https://rms.whyqtech.com';
@@ -581,38 +583,53 @@ export const getACRUsersWithApplicant = async (req: Request, res: Response) => {
     }
 }
 
-export const sendAcrJobApplicationMail = async (req: Request | any, res: Response) => {
+export const sendCIRJobApplicationMail = async (req: Request | any, res: Response) => {
     try {
         const { emails, jobId, mailType, date } = req.body;
 
-        const jobDetails = await Job.findOne({ job_id: jobId });
+        const jobDetails = await JobCIR.findOne({ job_id: jobId });
 
         function delay(ms: number) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         emails?.forEach(async (email: any, index: number) => {
-            const agency: any = await ACRUserModel.findOne({ personEmail: email });
+            const agency: any = await userModel.findOne({ email: email });
 
-            await ACRExtendJob.create({
+            // Check if CIRExtendJob exists for this user/job
+            const existing = await CIRExtendJob.findOne({
                 user_id: agency._id,
-                job_id: jobId,
-                extended_by: agency._id, // if you track who did the extension
-                job_expire_date: date,
-                reason: "Manual extension by admin"
+                job_id: jobId
             });
+
+            if (existing) {
+                // Update the existing extension
+                existing.job_expire_date = date;
+                existing.extended_by = agency._id; // or whoever is extending
+                existing.reason = "Manual extension by admin";
+                await existing.save();
+            } else {
+                // Create a new extension
+                await CIRExtendJob.create({
+                    user_id: agency._id,
+                    job_id: jobId,
+                    extended_by: agency._id, // or whoever is extending
+                    job_expire_date: date,
+                    reason: "Manual extension by admin"
+                });
+            }
 
             if (email) {
                 await delay(index * 1000); // Adding 1-second delay per email
                 if (mailType == 'new') {
-                    const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
+                    const success = await activeCIRRolesPostedMail(email, { name: agency?.name, job_type: jobDetails?.job_title });
                     if (!success) {
                         console.log(`Failed to send email to ${email}`);
                     }
                 }
 
                 if (mailType == 'reminder') {
-                    const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
+                    const success = await activeCIRRolesPostedMail(email, { name: agency?.name, job_type: jobDetails?.job_title });
                     if (!success) {
                         console.log(`Failed to send email to ${email}`);
                     }
@@ -634,6 +651,73 @@ export const sendAcrJobApplicationMail = async (req: Request | any, res: Respons
     }
 }
 
+export const sendAcrJobApplicationMail = async (req: Request | any, res: Response) => {
+    try {
+        const { emails, jobId, mailType, date } = req.body;
+
+        const jobDetails = await Job.findOne({ job_id: jobId });
+
+        function delay(ms: number) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        emails?.forEach(async (email: any, index: number) => {
+            const agency: any = await ACRUserModel.findOne({ personEmail: email });
+
+            // Check if ACRExtendJob exists for this user/job
+            const existing = await ACRExtendJob.findOne({
+                user_id: agency._id,
+                job_id: jobId
+            });
+
+            if (existing) {
+                // Update the existing extension
+                existing.job_expire_date = date;
+                existing.extended_by = agency._id; // or whoever is extending
+                existing.reason = "Manual extension by admin";
+                await existing.save();
+            } else {
+                // Create a new extension
+                await ACRExtendJob.create({
+                    user_id: agency._id,
+                    job_id: jobId,
+                    extended_by: agency._id, // or whoever is extending
+                    job_expire_date: date,
+                    reason: "Manual extension by admin"
+                });
+            }
+
+            if (email) {
+                await delay(index * 1000); // Adding 1-second delay per email
+                if (mailType == 'new') {
+                    const success = await activeRolesPostedMail(email, { name: agency?.agencyName });
+                    if (!success) {
+                        console.log(`Failed to send email to ${email}`);
+                    }
+                }
+
+                if (mailType == 'reminder') {
+                    const success = await RemainderActiveRolesPostedMailForACR(email, { agencyName: agency?.agencyName, roleName: jobDetails?.job_title, expiryDate: date });
+                    if (!success) {
+                        console.log(`Failed to send email to ${email}`);
+                    }
+                }
+            }
+        });
+
+        return res.status(200).json({
+            message: "Send mail successfully",
+            status: true,
+            data: { emails, jobDetails }
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            message: err.message,
+            status: false,
+            data: null
+        });
+    }
+}
 export const forgotUserPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
