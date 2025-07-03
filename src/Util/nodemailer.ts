@@ -277,7 +277,7 @@ export async function RemainderActiveRolesPostedMailForACR(
     data: any
 ): Promise<boolean> {
     try {
-        const subject = "Reapply Opportunity for Recent Role “Role Name” in Agency Capacity Record System";
+        const subject = `Reapply Opportunity for Recent Role “${data?.roleName}” in Agency Capacity Record System`;
         const htmlBody = missedACRRoleReapplyMailTemplate(data);
 
         await sendGraphMail({
