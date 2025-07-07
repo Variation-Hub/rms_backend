@@ -324,6 +324,20 @@ export const getJobs = async (req: any, res: Response) => {
                 user_id: userId
             });
 
+            if (job?.extendedJobDetails?.job_expire_date) {
+                if (job?.extendedJobDetails?.job_expire_date < new Date()) {
+                    job.status = "Expired";
+                } else {
+                    job.status = "Active";
+                }
+            } else {
+                if (job.jobExpireDate < new Date()) {
+                    job.status = "Expired";
+                } else {
+                    job.status = "Active";
+                }
+            } 
+
             return {
                 _id: job._id,
                 job_id: job.job_id,
@@ -339,7 +353,7 @@ export const getJobs = async (req: any, res: Response) => {
                 timerEnd: job.timerEnd,
                 jobExpireDate: job?.jobExpireDate,
                 job_time_left: job.status === "Inactive" || (processedApplicantInfo?.status === "Actioned" || processedApplicantInfo?.status === "Under Review") ? 0 : processedApplicantInfo?.cv_time_left || jobTimeLeft,
-                status: job.dynamicStatus,
+                status: job.dynamicStatus || (job.status),
                 ...processedApplicantInfo,
                 extendedJobDetails, // <-- Binds the extension info here
                 // createAt: job.createAt,
