@@ -282,6 +282,49 @@ export const activeRolesPostedMailTemplateCIRAdmin = (data: any) => {
         </div>`
 }
 
+export const RemainderActiveRolesPostedMailTemplateCIRAdmin = (data: any) => {
+    return `
+    <div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="width: 80%; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p>Dear <b>${data?.name}</b>,</p>
+            <p>We noticed that you were unable to apply for the <b>${data?.job_title}</b> role within the original application window on the CIR Portal.</p>
+            <p>As requested, we have now <b>reopened the application</b> for you till <b>${data?.extended_deadline}</b>. You may now submit your application within this new timeframe.</p>
+
+            <p><b>What You Need to Do:</b></p>
+            <ol>
+                <li>Log in to the CIR Portal.</li>
+                <li>Navigate to the "All Roles" section.</li>
+                <li>Locate the role, now marked as <b>Active for You</b>.</li>
+                <li>Download and review the <b>ReadMe</b> document.</li>
+                <li>Click “Apply” for the role.</li>
+                <li>Use your existing CV or upload an updated version, and specify your preferred work location.</li>
+                <li>Submit your application.</li>
+            </ol>
+
+            <p><b>Access the CIR Portal:</b><br/>
+                <a href="https://rms.saivensolutions.co.uk/#/cir/cir-login" style="display: inline-block; margin-top: 8px; font-weight: bold; color: #007bff;">Login to CIR</a>
+            </p>
+
+            <p style="margin-top: 20px; background-color: #fff8dc; padding: 10px; border-left: 4px solid #f0ad4e;">
+                📌 <b>Please note:</b> This is a <u>one-time extension</u>, and the role will close again on <b>${data?.new_expiry_date}</b>.<br/>
+                Kindly ensure you complete the application process before this deadline.
+            </p>
+
+            <p>If you have any questions or need further assistance, please contact:<br/>
+                <a href="mailto:jamie.thompson@saivensolutions.co.uk" style="text-decoration: none; font-weight: bold; color: #007bff;">jamie.thompson@saivensolutions.co.uk</a>
+            </p>
+
+            <p>Thank you for your continued interest.</p>
+
+            <div style="margin-top: 20px;">
+                <p>Best regards,<br/>
+                SaiVen Technology Solutions Limited</p>
+            </div>
+        </div>
+    </div>`;
+};
+
+
 export const newJobAlertMailTemplate = (data: any) => {
 
     return `<div style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">

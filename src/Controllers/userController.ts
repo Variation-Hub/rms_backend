@@ -6,7 +6,7 @@ import { comparepassword } from "../Util/bcrypt"
 import { deleteFromBackblazeB2, uploadMultipleFilesBackblazeB2, uploadToBackblazeB2 } from "../Util/aws"
 import ACRUserModel from "../Models/ACRUserModel"
 import mongoose from "mongoose"
-import { acrUserMailTemplateRegister, activeCIRRolesPostedMail, activeRolesPostedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, RemainderActiveRolesPostedMailForACR, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
+import { acrUserMailTemplateRegister, activeCIRRolesPostedMail, activeRolesPostedMail, adminMail, adminMailWithPassword, cvRecivedMailCIR, cvReviewMailCIR, forgotEmailSend, inviteLoginEmailSend, referViaCodeEmailSend, RemainderActiveCIRRolesPostedMail, RemainderActiveRolesPostedMailForACR, responseEmailSend, sendMailToCIRAdmins, uploadCVAlertMailCIR } from "../Util/nodemailer"
 import jwt from 'jsonwebtoken';
 import adminModel from "../Models/adminModel"
 import CandidateJobApplication from '../Models/candicateJobApplication'
@@ -629,7 +629,7 @@ export const sendCIRJobApplicationMail = async (req: Request | any, res: Respons
                 }
 
                 if (mailType == 'reminder') {
-                    const success = await activeCIRRolesPostedMail(email, { name: agency?.name, job_type: jobDetails?.job_title });
+                    const success = await RemainderActiveCIRRolesPostedMail(email, { name: agency?.name, job_type: jobDetails?.job_title, new_expiry_date: date });
                     if (!success) {
                         console.log(`Failed to send email to ${email}`);
                     }

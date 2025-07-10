@@ -1,5 +1,5 @@
 // import path from "path";
-import { acrPasswordGeneratedMailTemplate, acrUserWelcomeMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, activeRolesPostedMailTemplateCIRAdmin, adminMailTemplate, adminMailWithPhoneTemplate, agencyCapacityConfirmationTemplate, candidateInterestNotificationTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, missedACRRoleReapplyMailTemplate, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
+import { acrPasswordGeneratedMailTemplate, acrUserWelcomeMailTemplate, activeRolesPostedMailTemplate, activeRolesPostedMailTemplateCIR, activeRolesPostedMailTemplateCIRAdmin, adminMailTemplate, adminMailWithPhoneTemplate, agencyCapacityConfirmationTemplate, candidateInterestNotificationTemplate, cvRecivedMailTemplate, cvRecivedMailTemplateCIR, cvReviewMailTemplate, cvReviewMailTemplateCIR, generateEmailTemplateCard, generateEmailTemplateForgotPassword, generateEmailTemplateResponseEmailSend, InActiveRolesPostedMailTemplate, inviteLoginEmail, missedACRRoleReapplyMailTemplate, newJobAlertMailTemplate, newJobAlertMailTemplateCIR, referViaCode, RemainderActiveRolesPostedMailTemplateCIRAdmin, uploadCVAlertMailTemplate, uploadCVAlertMailTemplateCIR } from "./mailTemplate";
 const { Client } = require('@microsoft/microsoft-graph-client');
 const { ClientSecretCredential } = require('@azure/identity');
 import axios from 'axios';
@@ -299,6 +299,26 @@ export async function activeCIRRolesPostedMail(
     try {
         const subject = "Action Required: Review and Respond to New Active Role in CIR Portal";
         const htmlBody = activeRolesPostedMailTemplateCIRAdmin(data);
+
+        await sendGraphMail({
+            to: [reciverEmail],
+            subject,
+            htmlBody,
+        });
+
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+export async function RemainderActiveCIRRolesPostedMail(
+    reciverEmail: string,
+    data: any
+): Promise<boolean> {
+    try {
+        const subject = `Extended Opportunity to Apply – ${data.job_type} Role Now Open for Your Application`;
+        const htmlBody = RemainderActiveRolesPostedMailTemplateCIRAdmin(data);
 
         await sendGraphMail({
             to: [reciverEmail],
