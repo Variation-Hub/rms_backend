@@ -162,6 +162,7 @@ export const generateEmailTemplateResponseEmailSend = (data: any) => {
             <ul>
                 <li><b>User Name : </b>${data.name}</li>
                 <li><b>Email : </b>${data.email}</li>
+                <li><b>CV Link : </b>${data.link}</li>
             </ul>
             <p>Please log in to the portal to review the details and take any necessary actions.</p>
             <br/>

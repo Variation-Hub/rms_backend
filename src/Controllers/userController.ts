@@ -44,11 +44,16 @@ export const createUser = async (req: Request, res: Response) => {
             lookingFor = req.body.lookingFor.split(',')
         }
 
+        let preferredRoles = [];
+        if (req?.body?.preferredRoles) {
+            preferredRoles = req.body.preferredRoles.split(',')
+        }
+
         let workPreference = [];
         if (req.body.workPreference) {
             workPreference = req.body.workPreference.split(',')
         }
-        const newUser = await userModel.create({ ...req.body, lookingFor, workPreference, referredCode: referredCode.code })
+        const newUser = await userModel.create({ ...req.body, lookingFor, workPreference, preferredRoles, referredCode: referredCode.code })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredCode: referredCode.code, referredBy: newUser.referredBy })
 
         referredCode.code += 1;
@@ -56,7 +61,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
-        await responseEmailSend({ name: req.body.name, email: newUser.email })
+        await responseEmailSend({ name: req.body.name, email: newUser.email, link: newUser.cv?.url })
 
         return res.status(200).json({
             message: "User registration success",
@@ -120,6 +125,18 @@ export const updateUser = async (req: Request, res: Response) => {
                 status: false,
                 data: null
             });
+        }
+
+        if (updateData?.currentPassword && !(await comparepassword(updateData?.currentPassword, user.password))) {
+            return res.status(400).json({
+                message: "Please Enter Valid Current Password",
+                status: false,
+                data: null
+            })
+        }
+
+        if (updateData?.currentPassword) {
+            delete updateData['currentPassword']
         }
 
         const updatedUser = await userModel.findByIdAndUpdate(id, updateData, { new: true });

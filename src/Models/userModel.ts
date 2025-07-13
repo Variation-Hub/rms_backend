@@ -80,6 +80,10 @@ const userModel = new mongoose.Schema({
         type: [String],
         default: [],
     },
+    preferredRoles: {
+        type: [String],
+        default: [],
+    },
     workPreference: {
         type: [String],
         default: [],

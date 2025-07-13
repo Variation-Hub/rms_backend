@@ -568,7 +568,7 @@ export const getJobsCIR = async (req: any, res: Response) => {
             query.job_title = { $regex: keyword, $options: 'i' };
         }
 
-        if (job_type) {
+        if (job_type && job_type !== "All") {
             query.job_type = job_type
         }
 
