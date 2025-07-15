@@ -125,6 +125,10 @@ const userModel = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    eligible_for_SC: {
+        type: Boolean,
+        default: false
+    },
     willing_to_undertake: {
         type: String,
         trim: true,
