@@ -61,7 +61,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         const loginLink = `${url}/#/cir/cir-login`
         await inviteLoginEmailSend({ candidateName: req.body.name, email: newUser.email, link: loginLink });
-        await responseEmailSend({ name: req.body.name, email: newUser.email, link: newUser.cv?.url })
+        // await responseEmailSend({ name: req.body.name, email: newUser.email, link: newUser.cv?.url })
 
         return res.status(200).json({
             message: "User registration success",
@@ -140,6 +140,8 @@ export const updateUser = async (req: Request, res: Response) => {
         }
 
         const updatedUser = await userModel.findByIdAndUpdate(id, updateData, { new: true });
+
+        await responseEmailSend({ name: user.name, email: user.email, link: updateData.cv?.url });
 
         return res.status(200).json({
             message: "User updated successfully",

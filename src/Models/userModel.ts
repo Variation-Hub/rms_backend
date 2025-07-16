@@ -214,6 +214,10 @@ const userModel = new mongoose.Schema({
             roles: []
         }
     },
+    sc_dv_valid_upto: {
+        type: Date,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
