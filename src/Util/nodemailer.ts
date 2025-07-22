@@ -213,7 +213,7 @@ export async function responseEmailSend(data: any): Promise<boolean> {
         const htmlBody = generateEmailTemplateResponseEmailSend(data);
 
         const recipients = [
-            "jamie.thompson@saivensolutions.co.uk",
+            // "jamie.thompson@saivensolutions.co.uk",
             "rmswestgate@gmail.com" // fixed: removed extra `k` in `.comk`
         ];
 
@@ -625,7 +625,10 @@ export async function sendMailToCIRAdmins(reciverEmail: string, data: any): Prom
             : [];
 
         await sendGraphMailWithAttachment({
-            to: ["rmswestgate@gmail.com", "jamie.thompson@saivensolutions.co.uk"],
+            to: [
+                "rmswestgate@gmail.com", 
+                // "jamie.thompson@saivensolutions.co.uk"
+            ],
             subject,
             htmlBody,
             attachments,
