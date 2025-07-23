@@ -69,7 +69,7 @@ const userModel = new mongoose.Schema({
     referredBy: {
         type: String,
         trim: true,
-        default: "0",
+        default: "",
     },
     currentWork: {
         type: String,

@@ -912,12 +912,35 @@ export const getModelData = async (req: Request, res: Response) => {
 
         const { page, limit, skip } = req.pagination!;
 
-        const data = await Model.find(filter)
+        // Process filters for case-insensitive partial matching
+        const processedFilter: any = {};
+        
+        for (const [key, value] of Object.entries(filter)) {
+            if (typeof value === 'string' && value.trim() !== '') {
+                // Apply case-insensitive regex search for text fields
+                // Common text fields that should support partial matching
+                const textFields = [
+                    'name'
+                ];
+                
+                if (textFields.includes(key.toLowerCase())) {
+                    processedFilter[key] = { $regex: value, $options: 'i' };
+                } else {
+                    // For non-text fields, keep the original value
+                    processedFilter[key] = value;
+                }
+            } else {
+                // Keep non-string values as they are
+                processedFilter[key] = value;
+            }
+        }
+
+        const data = await Model.find(processedFilter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        const totalCount = await Model.countDocuments();
+        const totalCount = await Model.countDocuments(processedFilter);
 
         return res.status(200).json({
             message: "Data fetched successfully",
