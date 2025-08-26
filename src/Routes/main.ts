@@ -12,6 +12,7 @@ import { authorizeRolesWithoutErrorDB } from '../Middleware/verifyTokenDBAccess'
 import CandidateRoute from './candidateRoute'
 import contractDetailsRoutes from './contractDetailsRoutes'
 import futureCard from './futureCardRoute'
+import projectRoutes from './projectRoute'
 
 const Routes = express.Router();
 
@@ -24,6 +25,7 @@ Routes.use("/acr-contract", contractRoutes)
 Routes.use("/acr-detail-contract", contractDetailsRoutes)
 Routes.use("/candidate", CandidateRoute);
 Routes.use("/futures/card", futureCard)
+Routes.use("/project", projectRoutes)
 
 Routes.post("/upload", multipleFileUpload('files', 5), uploadFile);
 Routes.delete("/upload/delete", deleteFiles);
