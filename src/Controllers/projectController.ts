@@ -7,8 +7,9 @@ export const createProject = async (req: any, res: Response) => {
         const projectData = req.body;
 
         // Set createdBy and updatedBy from authenticated user
-        projectData.createdBy = req.user?.id;
-        projectData.updatedBy = req.user?.id;
+        console.log(req.user);
+        projectData.createdBy = req.user?._id;
+        projectData.updatedBy = req.user?._id;
 
         const project = new ProjectModel(projectData);
         const savedProject = await project.save();
@@ -163,7 +164,7 @@ export const updateProject = async (req: any, res: Response) => {
         const updateData = req.body;
 
         // Set updatedBy from authenticated user
-        updateData.updatedBy = req.user?.id;
+        updateData.updatedBy = req.user?._id;
 
         const project = await ProjectModel.findByIdAndUpdate(
             id,
@@ -209,7 +210,7 @@ export const deleteProject = async (req: any, res: Response) => {
             id,
             {
                 isActive: false,
-                updatedBy: req.user?.id
+                updatedBy: req.user?._id
             },
             { new: true }
         );
@@ -344,7 +345,7 @@ export const bulkUpdateProjectStatus = async (req: any, res: Response) => {
             { _id: { $in: projectIds } },
             {
                 status,
-                updatedBy: updatedBy || req.user?.id
+                updatedBy: updatedBy || req.user?._id
             }
         );
 
