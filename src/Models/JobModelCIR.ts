@@ -16,6 +16,11 @@ const JobSchemaCIR = new mongoose.Schema({
         enum: ['QA', 'Non-QA'],
         default: 'QA',
     },
+    project_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: true
+    },
     no_of_roles: {
         type: String,
         required: true,

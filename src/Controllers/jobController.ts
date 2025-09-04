@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Job from '../Models/JobModel';
 import JobCIR from '../Models/JobModelCIR';
 import Application from '../Models/applicationModel';
@@ -11,6 +12,7 @@ import userModel from '../Models/userModel';
 import CandidateJobApplication from '../Models/candicateJobApplication'
 import ACRExtendJob from '../Models/acrextendJobModel';
 import CIRExtendJob from '../Models/CirExtendJobModel';
+import Project from '../Models/ProjectModel';
 
 const emailSend = process.env.JOB_MAIL!;
 
@@ -560,8 +562,9 @@ export const getJobs = async (req: any, res: Response) => {
 export const getJobsCIR = async (req: any, res: Response) => {
     try {
         const { page, limit, skip } = req.pagination!;
-        const { keyword, job_type } = req.query
+        const { keyword, job_type, project_id } = req.query
         const user_id = req.user?._id;
+        const projectIdString = Array.isArray(project_id) ? project_id[0] : project_id;
 
         let query: any = { status: 'Active' }
         if (keyword) {
@@ -572,11 +575,35 @@ export const getJobsCIR = async (req: any, res: Response) => {
             query.job_type = job_type
         }
 
+        console.log(projectIdString, "project_id")
+
+        if (projectIdString && typeof projectIdString === 'string') {
+            query.project_id = new mongoose.Types.ObjectId(projectIdString)
+        }
+
+        console.log("Final query:", JSON.stringify(query, null, 2))
         let totalCount = await JobModelCIR.find(query).countDocuments();
+        console.log("Total count:", totalCount)
+
+        // Convert ObjectId for aggregation pipeline
+        const aggregationQuery = { ...query };
+        if (projectIdString && typeof projectIdString === 'string') {
+            aggregationQuery.project_id = new mongoose.Types.ObjectId(projectIdString);
+        }
+        
+        console.log("Aggregation query:", JSON.stringify(aggregationQuery, null, 2))
+
+        // Debug: Check what project_ids exist in the database
+        if (projectIdString && typeof projectIdString === 'string') {
+            const existingProjectIds = await JobModelCIR.distinct('project_id');
+            console.log("Existing project_ids in database:", existingProjectIds);
+            console.log("Looking for project_id:", projectIdString);
+            console.log("Converted ObjectId:", new mongoose.Types.ObjectId(projectIdString));
+        }
 
         const jobs = await JobModelCIR.aggregate([
             {
-                $match: query
+                $match: aggregationQuery
             },
             {
                 $lookup: {
@@ -585,6 +612,19 @@ export const getJobsCIR = async (req: any, res: Response) => {
                     foreignField: "_id",
                     as: "candidateApplications"
                 },
+            },
+            {
+                $lookup: {
+                    from: "projects",
+                    localField: "project_id",
+                    foreignField: "_id",
+                    as: "projectDetails"
+                },
+            },
+            {
+                $addFields: {
+                    projectDetails: { $arrayElemAt: ["$projectDetails", 0] }
+                }
             },
             {
                 $sort: {
@@ -635,6 +675,8 @@ export const getJobsCIR = async (req: any, res: Response) => {
                 client_name: job.client_name,
                 location: job.location,
                 day_rate: job.day_rate,
+                project_id: job.project_id,
+                projectDetails: job.projectDetails,
                 cirextendJobDetails, // <-- Binds the extension info here
                 // candidateDetails: matchingApplicant
             };
@@ -791,6 +833,19 @@ export const getCIRJobApplication = async (req: any, res: Response) => {
                 $unwind: '$jobDetails'
             },
             {
+                $lookup: {
+                    from: 'projects',
+                    localField: 'jobDetails.project_id',
+                    foreignField: '_id',
+                    as: 'projectDetails'
+                }
+            },
+            {
+                $addFields: {
+                    projectDetails: { $arrayElemAt: ["$projectDetails", 0] }
+                }
+            },
+            {
                 $project: {
                     _id: 1,
                     user_id: 1,
@@ -801,7 +856,8 @@ export const getCIRJobApplication = async (req: any, res: Response) => {
                     workPreference: 1,
                     createdAt: 1,
                     user: 1,
-                    jobDetails: 1
+                    jobDetails: 1,
+                    projectDetails: 1
                 }
             }
         ]);
@@ -1053,3 +1109,66 @@ export const applicationJobUpdate = async (req: Request, res: Response) => {
         });
     }
 }
+
+// Get projects for CIR jobs filter
+export const getProjectsForCIR = async (req: Request, res: Response) => {
+    try {
+        const projects = await Project.find({ 
+            type: 'CIR',
+            isActive: true 
+        }).select('_id projectName client status publishedDate').sort({ projectName: 1 });
+
+        return res.status(200).json({
+            message: "Projects retrieved successfully",
+            status: true,
+            data: projects
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};
+
+// Debug endpoint to check project_id filtering
+export const debugProjectFilter = async (req: Request, res: Response) => {
+    try {
+        const { project_id } = req.query;
+        const projectIdString = Array.isArray(project_id) ? project_id[0] : project_id;
+        
+        // Get all jobs with their project_ids
+        const allJobs = await JobModelCIR.find({ status: 'Active' }).select('_id job_title project_id');
+        
+        // Get distinct project_ids
+        const distinctProjectIds = await JobModelCIR.distinct('project_id');
+        
+        // If project_id is provided, test the filter
+        let filteredJobs = [];
+        if (projectIdString && typeof projectIdString === 'string') {
+            filteredJobs = await JobModelCIR.find({ 
+                status: 'Active',
+                project_id: new mongoose.Types.ObjectId(projectIdString)
+            }).select('_id job_title project_id');
+        }
+
+        return res.status(200).json({
+            message: "Debug information",
+            status: true,
+            data: {
+                allJobs,
+                distinctProjectIds,
+                filteredJobs,
+                projectIdProvided: projectIdString,
+                convertedObjectId: projectIdString && typeof projectIdString === 'string' ? new mongoose.Types.ObjectId(projectIdString) : null
+            }
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};

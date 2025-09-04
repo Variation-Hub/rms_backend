@@ -12,7 +12,7 @@ export interface IProject extends Document {
     };
     noOfPositions: number;
     clearanceOrCertifications: string[];
-    status: 'Active' | 'Future Role' | 'Expired';
+    status: 'Active' | 'Future Role' | 'Expired' | 'Completed';
     type: 'CIR' | 'ACR';
     isActive: boolean;
     createdAt: Date;
@@ -69,7 +69,7 @@ const ProjectSchema: Schema = new Schema({
     }],
     status: {
         type: String,
-        enum: ['Active', 'Future Role', 'Expired'],
+        enum: ['Active', 'Future Role', 'Expired', 'Completed'],
         default: 'Active',
         required: [true, 'Status is required']
     },

@@ -12,7 +12,9 @@ import {
     fetchJobIdCIR,
     getJobsCIR,
     deleteCIRJob,
-    getCIRJobApplication
+    getCIRJobApplication,
+    getProjectsForCIR,
+    debugProjectFilter
 } from '../Controllers/jobController';
 import { paginationMiddleware } from '../Middleware/pagination';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -27,6 +29,8 @@ router.put('/apply-job', authorizeRoles(), applicationJobUpdate)
 
 router.get('/jobs', authorizeRoles(), paginationMiddleware, getJobs);
 router.get('/jobs/cir', authorizeRoles(), paginationMiddleware, getJobsCIR);
+router.get('/projects/cir', authorizeRoles(), getProjectsForCIR);
+router.get('/debug/project-filter', authorizeRoles(), debugProjectFilter);
 
 router.get('/jobs/:id', authorizeRoles(), getJobById);
 router.get('/jobs/cir/:id', authorizeRoles(), getCIRJobApplication);
