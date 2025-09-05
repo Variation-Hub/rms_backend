@@ -911,6 +911,208 @@ export const updateJob = async (req: Request, res: Response) => {
     }
 };
 
+// Update a CIR job
+export const updateJobCIR = async (req: Request, res: Response) => {
+    try {
+        const job = await JobCIR.findOneAndUpdate({ job_id: req.params.id }, req.body, { new: true });
+        if (!job) return res.status(404).json({
+            message: "CIR Job not found",
+            status: false,
+            data: null
+        });
+        return res.status(200).json({
+            message: "CIR Job updated successfully",
+            status: true,
+            data: job
+        });
+    } catch (error: any) {
+        return res.status(400).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};
+
+// Fetch comprehensive job details
+export const fetchJobDetails = async (req: any, res: Response) => {
+    try {
+        const { job_id, job_type } = req.query;
+        const userId = req.user?._id;
+
+        if (!job_id) {
+            return res.status(400).json({
+                message: "Job ID is required",
+                status: false,
+                data: null
+            });
+        }
+
+        // Determine if it's a CIR job or regular job
+        const isCIRJob = job_type === 'CIR' || job_type === 'cir';
+
+        if (isCIRJob) {
+            // Fetch CIR job details
+            const job = await JobCIR.aggregate([
+                {
+                    $match: {
+                        job_id: job_id
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "projects",
+                        localField: "project_id",
+                        foreignField: "_id",
+                        as: "projectDetails"
+                    }
+                },
+                {
+                    $addFields: {
+                        projectDetails: { $arrayElemAt: ["$projectDetails", 0] }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "candidatejobapplications",
+                        localField: "candicateApplication",
+                        foreignField: "_id",
+                        as: "applications"
+                    }
+                },
+                {
+                    $addFields: {
+                        totalApplications: { $size: "$applications" },
+                        jobTimeLeft: {
+                            $subtract: ["$jobExpireDate", new Date()]
+                        },
+                        dynamicStatus: {
+                            $cond: [
+                                { $lt: [new Date(), "$jobExpireDate"] },
+                                "Active",
+                                "Expired"
+                            ]
+                        }
+                    }
+                }
+            ]);
+
+            if (!job || job.length === 0) {
+                return res.status(404).json({
+                    message: "CIR Job not found",
+                    status: false,
+                    data: null
+                });
+            }
+
+            const jobData = job[0];
+
+            return res.status(200).json({
+                message: "CIR Job details retrieved successfully",
+                status: true,
+                data: {
+                    _id: jobData._id,
+                    job_id: jobData.job_id,
+                    job_title: jobData.job_title,
+                    job_type: jobData.job_type,
+                    no_of_roles: jobData.no_of_roles,
+                    start_date: jobData.start_date,
+                    publish_date: jobData.publish_date,
+                    client_name: jobData.client_name,
+                    location: jobData.location,
+                    day_rate: jobData.day_rate,
+                    status: jobData.dynamicStatus,
+                    jobExpireDate: jobData.jobExpireDate,
+                    job_time_left: Math.max(jobData.jobTimeLeft, 0),
+                    upload: jobData.upload,
+                    projectDetails: jobData.projectDetails,
+                    totalApplications: jobData.totalApplications,
+                    createAt: jobData.createAt
+                }
+            });
+
+        } else {
+            // Fetch regular job details
+            const job = await Job.aggregate([
+                {
+                    $match: {
+                        job_id: job_id
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "jobapplications",
+                        localField: "applicants",
+                        foreignField: "_id",
+                        as: "applications"
+                    }
+                },
+                {
+                    $addFields: {
+                        totalApplications: { $size: "$applications" },
+                        jobTimeLeft: {
+                            $subtract: ["$timerEnd", new Date()]
+                        },
+                        dynamicStatus: {
+                            $cond: [
+                                { $eq: ["$status", "Inactive"] },
+                                "Inactive",
+                                {
+                                    $cond: [
+                                        { $lt: [new Date(), "$timerEnd"] },
+                                        "Active",
+                                        "Expired"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]);
+
+            if (!job || job.length === 0) {
+                return res.status(404).json({
+                    message: "Job not found",
+                    status: false,
+                    data: null
+                });
+            }
+
+            const jobData = job[0];
+
+            return res.status(200).json({
+                message: "Job details retrieved successfully",
+                status: true,
+                data: {
+                    _id: jobData._id,
+                    job_id: jobData.job_id,
+                    job_title: jobData.job_title,
+                    no_of_roles: jobData.no_of_roles,
+                    start_date: jobData.start_date,
+                    publish_date: jobData.publish_date,
+                    client_name: jobData.client_name,
+                    location: jobData.location,
+                    day_rate: jobData.day_rate,
+                    status: jobData.dynamicStatus,
+                    timerEnd: jobData.timerEnd,
+                    jobExpireDate: jobData.jobExpireDate,
+                    job_time_left: Math.max(jobData.jobTimeLeft, 0),
+                    upload: jobData.upload,
+                    totalApplications: jobData.totalApplications,
+                    createAt: jobData.createAt
+                }
+            });
+        }
+
+    } catch (error: any) {
+        return res.status(500).json({
+            message: error.message,
+            status: false,
+            data: null
+        });
+    }
+};
+
 // Delete a job
 export const deleteJob = async (req: Request, res: Response) => {
     try {
@@ -1132,43 +1334,4 @@ export const getProjectsForCIR = async (req: Request, res: Response) => {
     }
 };
 
-// Debug endpoint to check project_id filtering
-export const debugProjectFilter = async (req: Request, res: Response) => {
-    try {
-        const { project_id } = req.query;
-        const projectIdString = Array.isArray(project_id) ? project_id[0] : project_id;
-        
-        // Get all jobs with their project_ids
-        const allJobs = await JobModelCIR.find({ status: 'Active' }).select('_id job_title project_id');
-        
-        // Get distinct project_ids
-        const distinctProjectIds = await JobModelCIR.distinct('project_id');
-        
-        // If project_id is provided, test the filter
-        let filteredJobs = [];
-        if (projectIdString && typeof projectIdString === 'string') {
-            filteredJobs = await JobModelCIR.find({ 
-                status: 'Active',
-                project_id: new mongoose.Types.ObjectId(projectIdString)
-            }).select('_id job_title project_id');
-        }
 
-        return res.status(200).json({
-            message: "Debug information",
-            status: true,
-            data: {
-                allJobs,
-                distinctProjectIds,
-                filteredJobs,
-                projectIdProvided: projectIdString,
-                convertedObjectId: projectIdString && typeof projectIdString === 'string' ? new mongoose.Types.ObjectId(projectIdString) : null
-            }
-        });
-    } catch (error: any) {
-        return res.status(500).json({
-            message: error.message,
-            status: false,
-            data: null
-        });
-    }
-};

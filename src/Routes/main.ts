@@ -29,7 +29,7 @@ Routes.use("/project", projectRoutes)
 
 Routes.post("/upload", multipleFileUpload('files', 5), uploadFile);
 Routes.delete("/upload/delete", deleteFiles);
-Routes.get("/model/list", authorizeRolesWithoutErrorDB, paginationMiddleware, getModelData);
+Routes.get("/model/list", paginationMiddleware, getModelData);
 Routes.get("/model/download", downloadCsv);
 
 export default Routes; 
