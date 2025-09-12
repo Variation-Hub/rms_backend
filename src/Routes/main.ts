@@ -14,6 +14,7 @@ import contractDetailsRoutes from './contractDetailsRoutes'
 import futureCard from './futureCardRoute'
 import projectRoutes from './projectRoute'
 import bannerRoutes from './bannerRoute'
+import dashboardRoute from './dashboardRoute'
 
 const Routes = express.Router();
 
@@ -28,6 +29,7 @@ Routes.use("/candidate", CandidateRoute);
 Routes.use("/futures/card", futureCard)
 Routes.use("/project", projectRoutes)
 Routes.use("/banner", bannerRoutes)
+Routes.use("/dashboard", dashboardRoute)
 
 Routes.post("/upload", multipleFileUpload('files', 5), uploadFile);
 Routes.delete("/upload/delete", deleteFiles);
