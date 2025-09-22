@@ -4,11 +4,11 @@ import BannerText from '../Models/BannerTextModel';
 // Create or update banner text
 export const createOrUpdateBannerText = async (req: Request, res: Response) => {
     try {
-        const { page_type, content } = req.body;
+        const { page_type, content, background_color, logo } = req.body;
 
-        if (!page_type || !content) {
+        if (!page_type || !content || !background_color || !logo) {
             return res.status(400).json({
-                message: 'Page type and content are required',
+                message: 'Page type, content, background color, and logo are required',
                 status: false,
                 data: null
             });
@@ -23,7 +23,7 @@ export const createOrUpdateBannerText = async (req: Request, res: Response) => {
             // Update existing banner text
             bannerText = await BannerText.findOneAndUpdate(
                 { page_type },
-                { content },
+                { content, background_color, logo },
                 { new: true, runValidators: true }
             );
 
@@ -36,7 +36,9 @@ export const createOrUpdateBannerText = async (req: Request, res: Response) => {
             // Create new banner text
             bannerText = await BannerText.create({
                 page_type,
-                content
+                content,
+                background_color,
+                logo
             });
 
             return res.status(201).json({
@@ -94,7 +96,9 @@ export const getAllBannerTexts = async (req: any, res: Response) => {
         if (keyword) {
             query.$or = [
                 { page_type: { $regex: keyword, $options: 'i' } },
-                { content: { $regex: keyword, $options: 'i' } }
+                { content: { $regex: keyword, $options: 'i' } },
+                { background_color: { $regex: keyword, $options: 'i' } },
+                { logo: { $regex: keyword, $options: 'i' } }
             ];
         }
 
@@ -129,11 +133,11 @@ export const getAllBannerTexts = async (req: any, res: Response) => {
 export const updateBannerTextById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { page_type, content } = req.body;
+        const { page_type, content, background_color, logo } = req.body;
 
-        if (!page_type || !content) {
+        if (!page_type || !content || !background_color || !logo) {
             return res.status(400).json({
-                message: 'Page type and content are required',
+                message: 'Page type, content, background color, and logo are required',
                 status: false,
                 data: null
             });
@@ -155,7 +159,7 @@ export const updateBannerTextById = async (req: Request, res: Response) => {
 
         const bannerText = await BannerText.findByIdAndUpdate(
             id,
-            { page_type, content },
+            { page_type, content, background_color, logo },
             { new: true, runValidators: true }
         );
 
