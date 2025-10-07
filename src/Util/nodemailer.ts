@@ -39,7 +39,7 @@ async function sendResetPasswordEmail(to: string[] | string, htmlBody: any, subj
             },
             // toRecipients: recipients,
             // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: [{ emailAddress: { address: 'rmswestgate@gmail.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -78,8 +78,8 @@ export async function sendGraphMail(options: any): Promise<void> {
             // // })),
             // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
             // ccRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
-            ccRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: [{ emailAddress: { address: 'rmswestgate@gmail.com' } }],
+            ccRecipients: [{ emailAddress: { address: 'rmswestgate@gmail.com' } }],
             from: {
                 emailAddress: {
                     address: mail,
@@ -126,7 +126,7 @@ export async function sendGraphMailWithAttachment(options: any): Promise<void> {
             },
             // toRecipients,
             // toRecipients: [{ emailAddress: { address: 'darshandumaraliya@gmail.com' } }],
-            toRecipients: [{ emailAddress: { address: 'ayush@westgateithub.com' } }],
+            toRecipients: [{ emailAddress: { address: 'rmswestgate@gmail.com' } }],
             attachments,
             from: {
                 emailAddress: {
