@@ -19,7 +19,8 @@ import {
     getACRUsersWithApplicant,
     sendAcrJobApplicationMail,
     getCIRUsersWithApplicant,
-    sendCIRJobApplicationMail
+    sendCIRJobApplicationMail,
+    changeUserStatus
 } from '../Controllers/userController';
 import { singleFileUpload } from '../Util/multer';
 import { authorizeRoles } from '../Middleware/verifyToken';
@@ -37,6 +38,7 @@ userRoutes.post("/refer", authorizeRoles(), referUser)
 userRoutes.post("/apply-job/:job_id", authorizeRoles(), applyJobRole)
 userRoutes.post("/cir-user-with-applicant", paginationMiddleware, authorizeRoles(), getCIRUsersWithApplicant);
 userRoutes.post("/send-mail", authorizeRoles(), sendCIRJobApplicationMail)
+userRoutes.patch("/change-status/:id", authorizeRoles(), changeUserStatus)
 
 //ACR user routes
 userRoutes.post("/acr/register", createACRUser);
