@@ -40,18 +40,32 @@ export const createUser = async (req: Request, res: Response) => {
         }
 
         let lookingFor = [];
+        console.log("req.body.lookingFor", req.body.lookingFor)
         if (req.body.lookingFor) {
-            lookingFor = req.body.lookingFor.split(',')
+            // Check if it's already an array or a string that needs to be split
+            if (Array.isArray(req.body.lookingFor)) {
+                lookingFor = req.body.lookingFor;
+            } else {
+                lookingFor = req.body.lookingFor.split(',');
+            }
         }
 
         let preferredRoles = [];
         if (req?.body?.preferredRoles) {
-            preferredRoles = req.body.preferredRoles.split(',')
+            if (Array.isArray(req.body.preferredRoles)) {
+                preferredRoles = req.body.preferredRoles;
+            } else {
+                preferredRoles = req.body.preferredRoles.split(',')
+            }
         }
 
         let workPreference = [];
         if (req.body.workPreference) {
-            workPreference = req.body.workPreference.split(',')
+            if (Array.isArray(req.body.workPreference)) {
+                workPreference = req.body.workPreference;
+            } else {
+                workPreference = req.body.workPreference.split(',')
+            }
         }
         const newUser = await userModel.create({ ...req.body, lookingFor, workPreference, preferredRoles, referredCode: referredCode.code })
         const token = generateToken({ _id: newUser._id, email: newUser.email, name: newUser.name, referredCode: referredCode.code, referredBy: newUser.referredBy })

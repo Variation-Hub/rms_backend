@@ -10,7 +10,9 @@
     "dev": "nodemon src/index.ts",
     "start:dev": "copy .env.dev .env && nodemon src/index.ts",
     "start:live": "copy .env.prod .env && nodemon src/index.ts",
-    "dep": "NODE_OPTIONS=--max-old-space-size=4096 nodemon --exec ts-node src/index.ts"
+    "dep": "NODE_OPTIONS=--max-old-space-size=4096 nodemon --exec ts-node src/index.ts",
+    "update-jobs": "ts-node scripts/updateJobCIRData.ts",
+    "activate-users": "ts-node scripts/activateAllUsers.ts"
   },
   "keywords": [],
   "author": "",
